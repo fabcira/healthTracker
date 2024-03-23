@@ -1,4 +1,4 @@
-package it.torino.mobin.permissions
+package it.torino.mobin.onboarding.permissions
 
 import android.os.Build
 import androidx.annotation.RequiresApi

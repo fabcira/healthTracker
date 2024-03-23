@@ -1,4 +1,4 @@
-package it.torino.mobin.permissions
+package it.torino.mobin.onboarding.permissions
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import it.torino.mobin.MainActivity
-import it.torino.mobin.finalisation.batteryOptimisationRequest
+import it.torino.mobin.onboarding.batteryOptimisationRequest
 import it.torino.mobin.ui.theme.MobinTheme
 import it.torino.mobin.ui.theme.SmallPadding
 

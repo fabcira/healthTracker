@@ -1,4 +1,4 @@
-package it.torino.mobin.ui_utils.main_activity
+package it.torino.mobin.running.main_activity.panels
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -6,6 +6,6 @@ import androidx.compose.runtime.Composable
 
 
 @Composable
-fun HealthScreen(innerPadding: PaddingValues) {
+fun HealthPanel(innerPadding: PaddingValues) {
     Box(){}
 }

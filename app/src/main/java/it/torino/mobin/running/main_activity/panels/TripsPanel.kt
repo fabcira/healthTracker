@@ -1,4 +1,4 @@
-package it.torino.mobin.ui_utils.main_activity
+package it.torino.mobin.running.main_activity.panels
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -46,8 +46,6 @@ import it.torino.mobin.utils.getIcon
 import it.torino.mobin.utils.getName
 import it.torino.mobin.R
 import it.torino.tracker.retrieval.data.TripData
-import it.torino.tracker.tracker.sensors.location_recognition.LocationData
-import it.torino.tracker.utils.Utils
 import it.torino.tracker.utils.Utils.Companion.millisecondsToString
 import it.torino.tracker.view_model.MyViewModel
 

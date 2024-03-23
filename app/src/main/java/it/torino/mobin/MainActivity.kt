@@ -18,16 +18,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import it.torino.mobin.permissions.BatteryOptimisation
-import it.torino.mobin.permissions.TermsAndConditions
-import it.torino.mobin.permissions.ThreePermissions
-import it.torino.mobin.permissions.arePermissionsToBeRequested
-import it.torino.mobin.permissions.termsAndConditionsAccepted
+import it.torino.mobin.onboarding.permissions.BatteryOptimisation
+import it.torino.mobin.onboarding.permissions.TermsAndConditions
+import it.torino.mobin.onboarding.permissions.MainPermissionsComposable
+import it.torino.mobin.onboarding.permissions.arePermissionsToBeRequested
+import it.torino.mobin.onboarding.permissions.termsAndConditionsAccepted
 import it.torino.mobin.ui.theme.MobinTheme
-import it.torino.mobin.ui_utils.main_activity.ScaffoldWithFABInBottomBarM3
+import it.torino.mobin.running.main_activity.MainContainer
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
-import it.torino.tracker.utils.Globals.Companion.MSECS_IN_A_DAY
 import it.torino.tracker.view_model.MyViewModel
 import it.torino.tracker.view_model.MyViewModelFactory
 
@@ -64,7 +63,7 @@ class MainActivity : ComponentActivity() {
                                 TermsAndConditions(navController)
                             }
                             composable("Permissions") {
-                                ThreePermissions(activity, navController, viewModel)
+                                MainPermissionsComposable(activity, navController, viewModel)
                             }
                             composable("Battery_optimisation"){
                                 BatteryOptimisation(activity, navController)
@@ -72,7 +71,7 @@ class MainActivity : ComponentActivity() {
                         }
                         navigation(startDestination = secondDestination, route = "running") {
                             composable("Home") {
-                                ScaffoldWithFABInBottomBarM3(activity, viewModel)
+                                MainContainer(activity, viewModel)
                             }
                         }
                     }

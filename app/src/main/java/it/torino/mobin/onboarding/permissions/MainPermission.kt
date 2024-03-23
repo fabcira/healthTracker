@@ -1,4 +1,4 @@
-package it.torino.mobin.permissions
+package it.torino.mobin.onboarding.permissions
 
 
 import BackgroundLocationPermissions
@@ -16,11 +16,11 @@ import androidx.navigation.NavHostController
 import checkBackgroundLocationPermissionGranted
 import checkForegroundLocationPermissionGranted
 import it.torino.mobin.MainActivity
-import it.torino.mobin.finalisation.finaliseOnboarding
+import it.torino.mobin.onboarding.finaliseOnboarding
 import it.torino.tracker.view_model.MyViewModel
 
 @Composable
-fun ThreePermissions(activity: MainActivity, navController: NavHostController, viewModel: MyViewModel) {
+fun MainPermissionsComposable(activity: MainActivity, navController: NavHostController, viewModel: MyViewModel) {
         // State to track if the user has interacted with the foreground permission checkbox
         var foregroundPermissionRequested by remember { mutableStateOf(false) }
         // State to track if the user has interacted with the background permission checkbox

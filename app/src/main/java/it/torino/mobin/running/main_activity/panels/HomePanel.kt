@@ -1,4 +1,4 @@
-package it.torino.mobin.ui_utils.main_activity
+package it.torino.mobin.running.main_activity.panels
 
 import CustomProgressBarWithIcon
 import androidx.compose.foundation.background
@@ -12,11 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -27,9 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import it.torino.mobin.R
 import it.torino.mobin.ui.theme.DoubleSpacerHeight
-import it.torino.mobin.ui.theme.SpacerHeight
 import it.torino.mobin.ui.theme.White
-import it.torino.mobin.ui_utils.ui_elements.StepsProgressDial
+import it.torino.mobin.running.ui_elements.StepsProgressDial
 import it.torino.tracker.view_model.MyViewModel
 
 const val heartMinutesTarget = 40
@@ -37,7 +33,7 @@ const val walkingMinutesTarget = 100
 const val stepsTarget = 10000
 
 @Composable
-fun MainDialPanel(
+fun HomePanel(
     trackerViewModel: MyViewModel,
     innerPadding: PaddingValues
 ) {
@@ -78,7 +74,8 @@ fun MainDialPanel(
                     MaterialTheme.colorScheme.secondary,
                     MaterialTheme.colorScheme.tertiary,
                     MaterialTheme.colorScheme.primary,
-                    walkingMinutes/walkingMinutesTarget)
+                    walkingMinutes/ walkingMinutesTarget
+                )
                 Text(
                     text = "$walkingMinutes ${LocalContext.current.getString(R.string.move_minutes)}\n$numberOfSteps ${LocalContext.current.getString(R.string.steps)}",
                     color = MaterialTheme.colorScheme.onBackground,
@@ -88,7 +85,7 @@ fun MainDialPanel(
                 Spacer(modifier = Modifier
                     .size(DoubleSpacerHeight)
                     .fillMaxWidth())
-                CustomProgressBarWithIcon(MaterialTheme.colorScheme.primary, heartMinutes/heartMinutesTarget)
+                CustomProgressBarWithIcon(MaterialTheme.colorScheme.primary, heartMinutes/ heartMinutesTarget)
                 Text(
                     text = "$heartMinutes ${LocalContext.current.getString(R.string.move_minutes)}",
                     color = MaterialTheme.colorScheme.onBackground,

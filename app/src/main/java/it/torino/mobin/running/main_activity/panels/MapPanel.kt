@@ -1,4 +1,4 @@
-package it.torino.mobin.ui_utils.main_activity
+package it.torino.mobin.running.main_activity.panels
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -44,7 +44,6 @@ import it.torino.tracker.tracker.sensors.location_recognition.LocationData
 import it.torino.tracker.utils.Utils
 import it.torino.tracker.view_model.MyViewModel
 import android.graphics.Color as AndroidColor
-import androidx.compose.ui.platform.LocalDensity
 
 
 data class TimeSeriesData(val timestamp: Long, val cadence: Int)

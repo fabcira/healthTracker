@@ -1,4 +1,4 @@
-package it.torino.mobin.ui_utils.main_activity
+package it.torino.mobin.running.main_activity
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,10 +47,14 @@ import androidx.navigation.compose.rememberNavController
 import it.torino.mobin.MainActivity
 import it.torino.mobin.ui.theme.LargePadding
 import it.torino.mobin.R
+import it.torino.mobin.running.main_activity.panels.HealthPanel
+import it.torino.mobin.running.main_activity.panels.HomePanel
+import it.torino.mobin.running.main_activity.panels.MapViewComposable
+import it.torino.mobin.running.main_activity.panels.TripsScreen
 import it.torino.tracker.view_model.MyViewModel
 
 @Composable
-fun ScaffoldWithFABInBottomBarM3(
+fun MainContainer(
     activity: MainActivity,
     viewModel: MyViewModel
 ) {
@@ -69,18 +73,15 @@ fun ScaffoldWithFABInBottomBarM3(
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = "Home") {
             composable("Home") {
-                MainDialPanel(viewModel, innerPadding)
+                HomePanel(viewModel, innerPadding)
             }
             composable("Trips") { TripsScreen(viewModel, navController, innerPadding) }
             composable("Map") {
                 MapViewComposable(viewModel, innerPadding) }
 
-            composable("Health") { HealthScreen(innerPadding) }
+            composable("Health") { HealthPanel(innerPadding) }
         }
         LifeCycleAwareResultComputation(viewModel, navController, "Home")
-
-
-
     }
 }
 

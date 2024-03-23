@@ -1,4 +1,4 @@
-package it.torino.mobin.finalisation
+package it.torino.mobin.onboarding
 
 import android.content.Context
 import android.content.Intent

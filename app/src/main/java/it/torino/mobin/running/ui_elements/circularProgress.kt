@@ -1,4 +1,4 @@
-package it.torino.mobin.ui_utils.ui_elements
+package it.torino.mobin.running.ui_elements
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
