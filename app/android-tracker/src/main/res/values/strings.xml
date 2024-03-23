@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">Tracker</string>
+
+    <string name="go">Go</string>
+    <string name="disable_restrictions">Disable restrictions</string>
+    <string name="disable_restrictions_description">The app needs to continuously have the permissions granted to run in background to detect outdoor activities. The android operative system has some limitations that do not allow this. Please make sure that you disable the automatic removal of the permissions if the app is not used for a while, by clicking the button below. Then, click on Permissions and uncheck the \"Remove permissions if app isn\'t used\" checkbox</string>
+    <string name="personal_data_collection_attribution_tag">it.torino.tracker.tracker.attribution_tag</string>
+</resources>

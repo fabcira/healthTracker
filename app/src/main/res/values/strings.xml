@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Mobin</string>
+    <string name="app_title">Mobin Health</string>
+    <string name="still">Still</string>
+    <string name="walking">Walking</string>
+    <string name="running">Running</string>
+    <string name="cycling">Cycling</string>
+    <string name="vehicle">On Vehicle</string>
+    <string name="unknown">Unknown</string>
+    <string name="my_preference_key">preferences_key</string>
+
+    <string name="location_services">Location Services</string>
+    <string name="location_services_permission">I understand and agree that GPS data, provided by the location services on the mobile device, will be gathered by the Moving Health App and used to calculate measurements of mobility (average walking speed, distance walked each day, motor vehicle trips each day, time in motor vehicles each day).</string>
+    <string name="location_services_title_one">Physical Activity and Location Services</string>
+    <string name="location_services_title_two">Physical Activity and Location Services</string>
+    <string name="locationservices_dialog_message">The app requires the use of Location Services in order to work properly. Please enable Location Services.</string>
+    <string name="onboarding_description_first_install">In order to use the %1$s app, some permissions and the privacy policy need to be accepted. Please click on the continue button and follow the next steps to complete the configuration</string>
+    <string name="onboarding_location_0"><![CDATA[In order to accurately record your activity the app needs to access the Physical Activity and Location data stored on your mobile device.<br>Please follow the instructions below when the permissions are shown.]]></string>
+    <string name="onboarding_location_1"><![CDATA[1. Allow Moving Health to access your physical activity?<br>2. Click on Allow.]]></string>
+    <string name="onboarding_location_2"><![CDATA[Moving Health collects location data to enable accurate activity tracking even when the app is closed or not in use. For each of your activities a map is provided showing the route followed for a specific activity.<br><br>Follow the instructions below to enable location services running in the background:<br>1. Allow Moving Health to access this device’s location?<br>2. Click on <b>While using the app</b><br>3. Location Permission must be set to <b>Allow all the time</b>]]></string>
+    <string name="only_for">Before continuing, make sure to read and accept the Terms and Conditions.\n\nThen, we\'ll ask you to switch on the phone\'s motion and fitness sensors and the location detection. \n \nIt will take just a few seconds and it will make sure the app provides you with the best possible experience.</string>
+    <string name="open_permissions">Open Permissions</string>
+    <string name="paragraph_third_about_set_up">Please read and accept our Terms and Conditions.</string>
+    <string name="welcome_text">A smartphone study of activity and mobility in people with and without disease</string>
+
+    <string name="heart_minutes">♥ minutes</string>
+    <string name="move_minutes">move minutes</string>
+    <string name="steps">steps</string>
+</resources>
