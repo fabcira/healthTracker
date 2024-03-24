@@ -21,12 +21,15 @@ import androidx.navigation.navigation
 import it.torino.mobin.onboarding.permissions.BatteryOptimisation
 import it.torino.mobin.onboarding.permissions.TermsAndConditions
 import it.torino.mobin.onboarding.permissions.MainPermissionsComposable
+import it.torino.mobin.onboarding.permissions.PrivacyPolicy
 import it.torino.mobin.onboarding.permissions.arePermissionsToBeRequested
+import it.torino.mobin.onboarding.permissions.privacyPolicyShown
 import it.torino.mobin.onboarding.permissions.termsAndConditionsAccepted
 import it.torino.mobin.ui.theme.MobinTheme
 import it.torino.mobin.running.main_activity.MainContainer
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
+import it.torino.tracker.utils.Globals.Companion.MSECS_IN_A_DAY
 import it.torino.tracker.view_model.MyViewModel
 import it.torino.tracker.view_model.MyViewModelFactory
 
@@ -46,7 +49,10 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     var startDestination = "running"
                     var secondDestination = "Home"
-                    if (!termsAndConditionsAccepted()) {
+                    if (!privacyPolicyShown(LocalPreferencesManager.current)) {
+                        startDestination = "onboarding"
+                        secondDestination= "Privacy_Policy"
+                    } else if (!termsAndConditionsAccepted()) {
                         startDestination = "onboarding"
                         secondDestination= "T&Cs"
                     } else if (arePermissionsToBeRequested()) {
@@ -59,6 +65,9 @@ class MainActivity : ComponentActivity() {
                             startDestination = secondDestination,
                             route = "onboarding"
                         ) {
+                            composable("Privacy_Policy"){
+                                PrivacyPolicy(navController)
+                            }
                             composable("T&Cs") {
                                 TermsAndConditions(navController)
                             }

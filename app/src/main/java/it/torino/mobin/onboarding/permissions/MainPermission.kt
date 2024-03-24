@@ -29,6 +29,7 @@ fun MainPermissionsComposable(activity: MainActivity, navController: NavHostCont
         val context = LocalContext.current
 
         Column {
+
             // Permission has not been granted
             // You may want to show rationale or request the permission
             ForegroundLocationPermissions(

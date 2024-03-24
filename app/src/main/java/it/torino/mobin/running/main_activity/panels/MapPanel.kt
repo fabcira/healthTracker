@@ -38,8 +38,10 @@ import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
+import it.torino.mobin.running.ui_elements.TripSummary
 import it.torino.mobin.ui.theme.MediumPadding
 import it.torino.mobin.ui.theme.MobinTheme
+import it.torino.tracker.retrieval.data.TripData
 import it.torino.tracker.tracker.sensors.location_recognition.LocationData
 import it.torino.tracker.utils.Utils
 import it.torino.tracker.view_model.MyViewModel
@@ -52,32 +54,43 @@ data class TimeSeriesData(val timestamp: Long, val cadence: Int)
 @Composable
 fun MapViewComposable(myViewModel: MyViewModel, innerPadding: PaddingValues) {
     val currentIndex = myViewModel.currentTripIndex.observeAsState().value ?: 0
-//    LaunchedEffect(currentIndex) {
-//        Log.d("ComposeDebug", "Recomposing with currentIndex: $currentIndex")
-//    }
+    //    LaunchedEffect(currentIndex) {
+    //        Log.d("ComposeDebug", "Recomposing with currentIndex: $currentIndex")
+    //    }
     val locationsX = myViewModel.tripsList?.value?.getOrNull(myViewModel.currentTripIndex.value ?: 0)?.locations ?: emptyList()
-    val modifier=Modifier
-    ConstraintLayout(modifier = modifier
+    ConstraintLayout(modifier = Modifier
         .padding(innerPadding)
         .fillMaxSize()) {
-        val (box, graph) = createRefs()
+        val (element, box, graph) = createRefs()
         Box(
-            modifier = modifier
-                .constrainAs(box) {
+            modifier = Modifier
+                .constrainAs(element) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    // This box takes 80% of the parent's height
-                    height = Dimension.percent(0.85f)
+                    height = Dimension.percent(0.15f)
                 }
         ) {
-            DrawMap(modifier,
-                innerPadding,
-                locationsX)
+            val trip: TripData? = myViewModel.tripsList?.value?.get(currentIndex)
+            trip.let{
+                TripSummary(trip!!)
+            }
+        }
+        Box(
+            modifier = Modifier
+                .padding(MediumPadding)
+                .constrainAs(box) {
+                    top.linkTo(element.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.percent(0.60f)
+                }
+        ) {
+            DrawMap(locationsX)
             if (myViewModel.currentTripIndex.value!! > 1)
                 ArrowInCircle(
                     Icons.Filled.ArrowBack,
-                    modifier= modifier.align(Alignment.BottomStart)
+                    modifier= Modifier.align(Alignment.BottomStart)
                         .padding(MediumPadding)
                 ) {
                     myViewModel.setCurrentTripIndex(currentIndex - 1)
@@ -85,7 +98,7 @@ fun MapViewComposable(myViewModel: MyViewModel, innerPadding: PaddingValues) {
             if (myViewModel.currentTripIndex.value!! < myViewModel.tripsList!!.value!!.size - 1)
                 ArrowInCircle(
                     Icons.Filled.ArrowForward,
-                    modifier= modifier.align(Alignment.BottomEnd)
+                    modifier= Modifier.align(Alignment.BottomEnd)
                         .padding(MediumPadding)
                 ) {
                     myViewModel.setCurrentTripIndex(currentIndex!! + 1)
@@ -94,18 +107,20 @@ fun MapViewComposable(myViewModel: MyViewModel, innerPadding: PaddingValues) {
 
         TimeSeriesBarChart(
             data = getTimeSeriesData(myViewModel, currentIndex),
-            modifier = modifier
+            modifier = Modifier
                 .padding(MediumPadding)
                 .constrainAs(graph) {
+                    top.linkTo(box.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
                     // This box takes 80% of the parent's height
-                    height = Dimension.percent(0.15f)
+                    height = Dimension.percent(0.20f)
                 }
         )
     }
 }
+
 
 /**
  * creates a time series of teh cadences of the trip
@@ -117,11 +132,10 @@ fun getTimeSeriesData(viewModel: MyViewModel, currentIndex: Int): List<TimeSerie
 }
 
 @Composable
-fun DrawMap(modifier: Modifier,
-            innerPadding: PaddingValues,
-            locationsX: List<LocationData>?) {
+fun DrawMap(locationsX: List<LocationData>?) {
     AndroidView(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(), // This should make the AndroidView fill the Box
+
         factory = { context ->
             locationsX.let {
                 MapView(context).apply {
@@ -179,7 +193,8 @@ fun DrawMap(modifier: Modifier,
                 if (locationsX.isNotEmpty()) {
                     val bounds = builder.build()
                     val padding =
-                        100 + innerPadding.calculateTopPadding().value.toInt() // Offset from edges of the map in pixels
+                        100
+//                    100 + innerPadding.calculateTopPadding().value.toInt() // Offset from edges of the map in pixels
                     // Animate the camera to show all markers within the bounds, including padding.
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
                         bounds,
@@ -204,7 +219,9 @@ fun DrawMap(modifier: Modifier,
                         })
                 }
             }
-        })
+
+        }
+    )
 }
 
 
@@ -222,16 +239,35 @@ fun TimeSeriesBarChart(data: List<TimeSeriesData>, modifier: Modifier = Modifier
     val timeSpan = (data.last().timestamp - data.first().timestamp).toFloat()
 
     Canvas(modifier = modifier.fillMaxSize()) {
-        val labelPadding = 8.dp.toPx() // Space between labels and axes
-        val labelTextSize = 4.dp.toPx() // Size of the text for labels
-        val yAxisLabelWidth = 40.dp.toPx() // Estimated width to accommodate Y-axis labels
+        val labelPadding = 4.dp.toPx() // Space between labels and axes
+        val labelTextSize = 8.dp.toPx() // Size of the text for labels
+        val yAxisLabelWidth = 30.dp.toPx() // Estimated width to accommodate Y-axis labels
 
         val chartHeight = size.height * 0.8f // Allocate 80% height for the chart
         val chartWidth = size.width - yAxisLabelWidth // Adjust chart width to account for Y-axis labels
         val barWidth = chartWidth / data.size
         // Offset drawing start position to the right to accommodate Y-axis labels
-        val startX = yAxisLabelWidth
 
+
+        // Draw bars with offset
+        data.forEachIndexed { _, _ ->
+            val padding = 4f // Define the padding size
+            data.forEachIndexed { index, item ->
+                // Adjust the starting X position and width for padding
+                val adjustedBarWidth = barWidth - 2 * padding // Subtract padding from both sides
+                val left =
+                    yAxisLabelWidth + index * barWidth + padding // Start from original left plus padding
+                val normalizedValue = (item.cadence - minValue) / (maxValue - minValue)
+                val barHeight = chartHeight * normalizedValue
+                val top = chartHeight - barHeight
+
+                drawRect(
+                    color = Color.Blue,
+                    topLeft = Offset(left, top),
+                    size = Size(adjustedBarWidth, barHeight) // Use the adjusted width
+                )
+            }
+        }
         // Draw a line at a specific Y-value (e.g., 100)
         val targetValue = 100f
         if (targetValue in minValue..maxValue) {
@@ -243,18 +279,6 @@ fun TimeSeriesBarChart(data: List<TimeSeriesData>, modifier: Modifier = Modifier
                 strokeWidth = 2.dp.toPx()
             )
         }
-        // Draw bars with offset
-        data.forEachIndexed { index, item ->
-            val left = startX + index * barWidth
-            val normalizedValue = (item.cadence - minValue) / (maxValue - minValue)
-            val barHeight = chartHeight * normalizedValue
-            val top = chartHeight - barHeight
-            drawRect(
-                color = Color.Blue,
-                topLeft = Offset(left, top),
-                size = Size(barWidth, barHeight)
-            )
-        }
         // X Axis and Labels
         val xAxisLabels = 5
         val interval = data.size / (xAxisLabels - 1)
@@ -264,7 +288,7 @@ fun TimeSeriesBarChart(data: List<TimeSeriesData>, modifier: Modifier = Modifier
                 val xPos = index * barWidth
                 drawContext.canvas.nativeCanvas.drawText(
                     Utils.millisecondsToString(data[index].timestamp, "HH:mm:ss").orEmpty(),
-                    xPos+startX,
+                    xPos + yAxisLabelWidth,
                     chartHeight + labelPadding + labelTextSize,
                     android.graphics.Paint().apply {
                         textSize = labelTextSize
@@ -292,14 +316,14 @@ fun TimeSeriesBarChart(data: List<TimeSeriesData>, modifier: Modifier = Modifier
         // Draw X and Y axes considering startX offset
         drawLine(
             color = axisColor,
-            start = Offset(startX, chartHeight),
+            start = Offset(yAxisLabelWidth, chartHeight),
             end = Offset(size.width, chartHeight),
             strokeWidth = axisStrokeWidth
         )
         drawLine(
             color = axisColor,
-            start = Offset(startX, 0f),
-            end = Offset(startX, chartHeight),
+            start = Offset(yAxisLabelWidth, 0f),
+            end = Offset(yAxisLabelWidth, chartHeight),
             strokeWidth = axisStrokeWidth
         )
     }
@@ -351,5 +375,13 @@ private fun PreviewMap() {
         MapViewComposable(viewModel, PaddingValues(16.dp))
         viewModel.setRelevantLocations(locations)
     }
+
+}
+
+@Preview
+@Composable
+private fun ElemPreview() {
+    val trip = TripData(1000, 20000, 7, 1000, 2000, 3000, false)
+    TripSummary(trip)
 
 }

@@ -3,10 +3,22 @@ package it.torino.mobin.onboarding.permissions
 import CheckboxWithRationale
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
+import it.torino.mobin.R
+import it.torino.mobin.ui.theme.MediumPadding
+import it.torino.mobin.ui.theme.SpacerHeight
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -20,13 +32,24 @@ fun ActivityRecognitionPermissions(permissionRequested: Boolean,
                     (activityRecognitionPermissionState.status as PermissionStatus.Denied).shouldShowRationale)
 
 
-    // Foreground permission checkbox
-    CheckboxWithRationale(
-        label = "Allow Activity Recognition Access",
-        permissionState = activityRecognitionPermissionState,
-        showRationale = showForegroundRationale,
-        onPermissionRequested = onCheckedChange
-    )
+    Column(modifier = Modifier.fillMaxSize()
+        .padding(MediumPadding)) {
+        Text(
+            LocalContext.current.getString(R.string.physical_activity),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(SpacerHeight),
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
+        )
+        // Foreground permission checkbox
+        CheckboxWithRationale(
+            label = "Allow Activity Recognition Access",
+            permissionState = activityRecognitionPermissionState,
+            showRationale = showForegroundRationale,
+            onPermissionRequested = onCheckedChange
+        )
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
