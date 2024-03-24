@@ -1,11 +1,27 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
 
+val localProperties =  Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load( FileInputStream(localPropertiesFile))
+    println("Loaded local.properties")
+}
+
+
 android {
     namespace = "it.torino.mobin"
     compileSdk = 34
+
+    buildFeatures {
+        // Enable the generation of BuildConfig fields
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "it.torino.mobin"
@@ -18,23 +34,32 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = localProperties["GOOGLE_MAPS_API_KEY"] as String? ?: ""
+
+        // Make sure to call toString() since Kotlin doesn't automatically call it.
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"${localProperties.getProperty("GOOGLE_MAPS_API_KEY")}\"")
+        buildConfigField("String", "keystore_password", "\"${localProperties.getProperty("keystore_password")}\"")
+        buildConfigField("String", "key_alias", "\"${localProperties.getProperty("key_alias")}\"")
+        buildConfigField("String", "key_password", "\"${localProperties.getProperty("key_password")}\"")
+        buildConfigField("String", "keystore", "\"${localProperties.getProperty("keystore")}\"")
+
     }
 
-        signingConfigs {
-            create("release") {
-                storeFile = file(project.properties["keystore"] as String)
-                storePassword = project.properties["keystore_password"] as String
-                keyAlias = project.properties["key_alias"] as String
-                keyPassword = project.properties["key_password"] as String
-            }
-            getByName("debug") {
-                // Debug configuration can be similar to release or different based on your requirement
-                storeFile = file(project.properties["keystore"] as String)
-                storePassword = project.properties["keystore_password"] as String
-                keyAlias = project.properties["key_alias"] as String
-                keyPassword = project.properties["key_password"] as String
-            }
+    signingConfigs {
+        create("release") {
+            storeFile = file(localProperties["keystore"] as String)
+            storePassword = localProperties["keystore_password"] as String
+            keyAlias = localProperties["key_alias"] as String
+            keyPassword = localProperties["key_password"] as String
         }
+        getByName("debug") {
+            // Your debug configuration here, if it's different
+            storeFile = file(localProperties["keystore"] as String)
+            storePassword = localProperties["keystore_password"] as String
+            keyAlias = localProperties["key_alias"] as String
+            keyPassword = localProperties["key_password"] as String
+        }
+    }
 
     buildTypes {
         release {
