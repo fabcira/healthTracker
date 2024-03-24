@@ -96,9 +96,9 @@ class MyViewModel(val application: Context) : ViewModel() {
         TrackerService.currentTracker?.keepFlushingToDB(flush)
     }
 
-    fun computeResults(viewModel: MyViewModel) {
+    fun computeResults() {
         currentDateTime.value.let {
-            Log.i(TAG, "Computing results: viewModel? $viewModel")
+            Log.i(TAG, "Computing results: viewModel? $this")
             val midnight = Utils.midnightinMsecs(currentDateTime.value!!)
             val computeDayDataAsync = ComputeDayDataAsync(
                 application,
@@ -107,7 +107,7 @@ class MyViewModel(val application: Context) : ViewModel() {
                 getEndTime(midnight),
                 true
             )
-            computeDayDataAsync.computeResultsAsync(viewModel)
+            computeDayDataAsync.computeResultsAsync(this)
         }
     }
 
@@ -151,6 +151,7 @@ class MyViewModel(val application: Context) : ViewModel() {
 
     fun setCurrentDateTime(newTime: Long){
         currentDateTime.value=newTime
+        computeResults()
     }
     fun setCurrentTripIndex(index: Int) {
         currentTripIndex.value=index

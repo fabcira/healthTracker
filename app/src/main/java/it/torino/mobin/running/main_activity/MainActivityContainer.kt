@@ -1,9 +1,12 @@
 package it.torino.mobin.running.main_activity
 
+import android.app.DatePickerDialog
+import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,13 +15,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -26,9 +41,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -52,6 +70,7 @@ import it.torino.mobin.running.main_activity.panels.HomePanel
 import it.torino.mobin.running.main_activity.panels.MapViewComposable
 import it.torino.mobin.running.main_activity.panels.TripsScreen
 import it.torino.tracker.view_model.MyViewModel
+import java.util.Calendar
 
 @Composable
 fun MainContainer(
@@ -62,26 +81,38 @@ fun MainContainer(
 
     val navigationBarHeight = 88.dp
     val selectedIndex by remember { mutableStateOf(1) }
-    Scaffold(
-        topBar = {
-            TopTitleBar()
-        },
-        bottomBar = {
-            BottomIconBar(navController = navController, navigationBarHeight,
-                selectedIndexState = remember { mutableStateOf(selectedIndex) })
-        }
-    ) { innerPadding ->
-        NavHost(navController = navController, startDestination = "Home") {
-            composable("Home") {
-                HomePanel(viewModel, innerPadding)
-            }
-            composable("Trips") { TripsScreen(viewModel, navController, innerPadding) }
-            composable("Map") {
-                MapViewComposable(viewModel, innerPadding) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-            composable("Health") { HealthPanel(innerPadding) }
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(onDestinationClicked = {
+                print("aaa")
+            })
+        }) {
+        Scaffold(
+            topBar = {
+                TopTitleBar(viewModel)
+            },
+            bottomBar = {
+                BottomIconBar(navController = navController, navigationBarHeight,
+                    selectedIndexState = remember { mutableStateOf(selectedIndex) })
+            }
+        ) { innerPadding ->
+            NavHost(navController = navController, startDestination = "Home") {
+                composable("Home") {
+                    HomePanel(viewModel, innerPadding)
+                }
+                composable("Trips") { TripsScreen(viewModel, navController, innerPadding) }
+                composable("Map") {
+                    MapViewComposable(viewModel, innerPadding)
+                }
+
+                composable("Health") { HealthPanel(innerPadding) }
+            }
+            LifeCycleAwareResultComputation(viewModel, navController, "Home")
         }
-        LifeCycleAwareResultComputation(viewModel, navController, "Home")
     }
 }
 
@@ -94,7 +125,7 @@ fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, navController: Nav
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 myViewModel.onResume(context)
-                myViewModel.computeResults(myViewModel)
+                myViewModel.computeResults()
                 // Navigate to "Home" only if not already there to avoid loop or unnecessary navigation
                 if (navController.currentDestination?.route != startDestination) {
                     navController.navigate(startDestination) {
@@ -115,7 +146,7 @@ fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, navController: Nav
     }
     // React to status changes
     LaunchedEffect(myViewModel.currentDateTime.value) {
-        myViewModel.computeResults(myViewModel)
+        myViewModel.computeResults()
     }
 }
 
@@ -144,7 +175,10 @@ fun BottomIconBar(navController: NavHostController, navigationBarHeight: Dp,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopTitleBar() {
+fun TopTitleBar(viewModel: MyViewModel) {
+    var selectedDate by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    var showMenu by remember { mutableStateOf(false) }
     TopAppBar(
         title = {
             Text(
@@ -158,6 +192,44 @@ fun TopTitleBar() {
             containerColor = MaterialTheme.colorScheme.secondary,
             titleContentColor = MaterialTheme.colorScheme.primary
         ),
+        actions = {
+            // Menu icon button
+            IconButton(onClick = { showMenu = !showMenu }) {
+                Icon(Icons.Filled.Menu, "menu", tint = MaterialTheme.colorScheme.onBackground)
+            }
+            // Dropdown menu
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("History") },
+                    onClick = {
+                        showMenu = false
+                        showDatePicker(context) { year, month, dayOfMonth ->
+                            // Construct a Calendar object and set it to the selected date
+                            val calendar = Calendar.getInstance().apply {
+                                set(year, month, dayOfMonth)
+                            }
+                            // Convert the selected date to milliseconds
+                            val dateInMillis = calendar.timeInMillis
+                            // Call the ViewModel's function with the selected date in milliseconds
+                            viewModel.setCurrentDateTime(dateInMillis)
+
+                            // Optionally update the UI
+                            selectedDate = "$dayOfMonth/${month + 1}/$year"
+                        }
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Settings") },
+                    onClick = {
+                        showMenu = false
+                        // Handle "Settings" action
+                    }
+                )
+            }
+        }
     )
 }
 
@@ -270,6 +342,39 @@ fun CustomFABInBottomBar(
     }
 }
 
+
+
+@Composable
+fun DrawerContent(onDestinationClicked: (String) -> Unit) {
+    Column {
+//        DrawerItem(icon = Icons.Filled.History, label = "History", onItemClick = { onDestinationClicked("History") })
+        DrawerItem(icon = Icons.Filled.Settings, label = "Settings", onItemClick = { onDestinationClicked("Settings") })
+    }
+}
+
+@Composable
+fun DrawerItem(icon: ImageVector, label: String, onItemClick: () -> Unit) {
+    TextButton(onClick = onItemClick) {
+        Icon(icon, contentDescription = null)
+        Text(text = label, modifier = androidx.compose.ui.Modifier.padding(start = 8.dp))
+    }
+}
+
+
+fun showDatePicker(context: android.content.Context, onDateSelected: (year: Int, month: Int, dayOfMonth: Int) -> Unit) {
+    // Get the current date
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    // Create and show the date picker dialog
+    val datePickerDialog = DatePickerDialog(context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+        onDateSelected(year, month, dayOfMonth)
+    }, year, month, day)
+
+    datePickerDialog.show()
+}
 @Preview(showBackground = true)
 @Composable
 fun ScaffoldWithFABInBottomBarM3Preview() {
