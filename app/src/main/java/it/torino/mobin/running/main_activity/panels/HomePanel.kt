@@ -77,7 +77,7 @@ fun HomePanel(
                     walkingMinutes/ walkingMinutesTarget
                 )
                 Text(
-                    text = "$walkingMinutes ${LocalContext.current.getString(R.string.move_minutes)}\n$numberOfSteps ${LocalContext.current.getString(R.string.steps)}",
+                    text = "${walkingMinutes.toInt()} ${LocalContext.current.getString(R.string.move_minutes)}\n$numberOfSteps ${LocalContext.current.getString(R.string.steps)}",
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
                     modifier = Modifier.fillMaxWidth()
@@ -87,7 +87,7 @@ fun HomePanel(
                     .fillMaxWidth())
                 CustomProgressBarWithIcon(MaterialTheme.colorScheme.primary, heartMinutes/ heartMinutesTarget)
                 Text(
-                    text = "$heartMinutes ${LocalContext.current.getString(R.string.move_minutes)}",
+                    text = "${heartMinutes.toInt()} ${LocalContext.current.getString(R.string.heart_minutes)}",
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
                     modifier = Modifier.fillMaxWidth()

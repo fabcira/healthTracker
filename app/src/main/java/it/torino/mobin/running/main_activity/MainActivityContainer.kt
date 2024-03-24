@@ -2,6 +2,7 @@ package it.torino.mobin.running.main_activity
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
@@ -69,14 +69,20 @@ import it.torino.mobin.running.main_activity.panels.HealthPanel
 import it.torino.mobin.running.main_activity.panels.HomePanel
 import it.torino.mobin.running.main_activity.panels.MapViewComposable
 import it.torino.mobin.running.main_activity.panels.TripsScreen
+import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.tracker.view_model.MyViewModel
 import java.util.Calendar
+import androidx.activity.viewModels
+import it.torino.mobin.utils.InterfaceViewModelFactory
+
 
 @Composable
 fun MainContainer(
     activity: MainActivity,
-    viewModel: MyViewModel
+    viewModel: MyViewModel,
+    interfaceViewModel: InterfaceViewModel
 ) {
+    val context = LocalContext.current
     val navController: NavHostController = rememberNavController()
 
     val navigationBarHeight = 88.dp
@@ -106,7 +112,7 @@ fun MainContainer(
                 }
                 composable("Trips") { TripsScreen(viewModel, navController, innerPadding) }
                 composable("Map") {
-                    MapViewComposable(viewModel, innerPadding)
+                    MapViewComposable(viewModel, interfaceViewModel, innerPadding)
                 }
 
                 composable("Health") { HealthPanel(innerPadding) }

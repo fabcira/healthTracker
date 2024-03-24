@@ -29,6 +29,7 @@ import it.torino.mobin.utils.getIcon
 import it.torino.mobin.utils.getName
 import it.torino.tracker.retrieval.data.TripData
 import it.torino.tracker.utils.Utils
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -58,9 +59,9 @@ fun TripSummary(trip: TripData) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "${Utils.millisecondsToString(trip.getStartTimeInMsecs(), "HH:mm")}"
+                text = "${Utils.millisecondsToString(trip.getStartTimeInMsecs(), "HH:mm")} "
                         +
-                        "-${Utils.millisecondsToString(trip.getEndTimeInMsecs(), "HH:mm")}",
+                        "- ${Utils.millisecondsToString(trip.getEndTimeInMsecs(), "HH:mm")}",
                 color = Color.Black,
                 fontSize = h5,
                 fontWeight = FontWeight.Normal,
@@ -85,8 +86,10 @@ fun TripSummary(trip: TripData) {
                 fontSize = h5,
                 fontWeight = FontWeight.Normal
             )
+            var speedValue = trip.distanceInMeters.toFloat() / (trip.getDuration(trip.chart)/1000f)
+            speedValue = (speedValue * 10).roundToInt() / 10.0f
             Text(
-                text = "${trip.distanceInMeters / trip.getDuration(trip.chart)} m/s",
+                text = "$speedValue m/s",
                 color = Color.Black,
                 fontSize = h5,
                 fontWeight = FontWeight.Normal

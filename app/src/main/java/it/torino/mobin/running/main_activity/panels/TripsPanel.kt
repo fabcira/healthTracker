@@ -49,7 +49,7 @@ fun TripsList(navController: NavController, viewModel: MyViewModel, items: List<
     LazyColumn (modifier = Modifier
         .padding(vertical= marginVertical)){
         itemsIndexed(items) { index, item ->
-            if (item.activityType != DetectedActivity.STILL) {
+            if (item.activityType != DetectedActivity.STILL && item.getDuration(item.chart)> 150000) {
                 TripItemLayout(navController, viewModel, index)
                 // Only add the Box (connector/divider) if this is not the last item
                 if (index < items.size - 1) {

@@ -27,9 +27,10 @@ import it.torino.mobin.onboarding.permissions.privacyPolicyShown
 import it.torino.mobin.onboarding.permissions.termsAndConditionsAccepted
 import it.torino.mobin.ui.theme.MobinTheme
 import it.torino.mobin.running.main_activity.MainContainer
+import it.torino.mobin.utils.InterfaceViewModel
+import it.torino.mobin.utils.InterfaceViewModelFactory
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
-import it.torino.tracker.utils.Globals.Companion.MSECS_IN_A_DAY
 import it.torino.tracker.view_model.MyViewModel
 import it.torino.tracker.view_model.MyViewModelFactory
 
@@ -42,6 +43,8 @@ class MainActivity : ComponentActivity() {
             MobinTheme {
                 val context = LocalContext.current
                 CompositionLocalProvider(LocalPreferencesManager provides PreferencesManager(context)) {
+                    val interfaceViewModelFactory = InterfaceViewModelFactory(LocalContext.current)
+                    val interfaceViewModel: InterfaceViewModel by viewModels { interfaceViewModelFactory }
                     val myViewModelFactory = MyViewModelFactory(LocalContext.current)
                     val viewModel: MyViewModel by viewModels { myViewModelFactory }
 
@@ -80,7 +83,7 @@ class MainActivity : ComponentActivity() {
                         }
                         navigation(startDestination = secondDestination, route = "running") {
                             composable("Home") {
-                                MainContainer(activity, viewModel)
+                                MainContainer(activity, viewModel, interfaceViewModel)
                             }
                         }
                     }

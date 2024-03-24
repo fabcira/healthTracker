@@ -15,6 +15,9 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +35,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
@@ -41,6 +45,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import it.torino.mobin.running.ui_elements.TripSummary
 import it.torino.mobin.ui.theme.MediumPadding
 import it.torino.mobin.ui.theme.MobinTheme
+import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.tracker.retrieval.data.TripData
 import it.torino.tracker.tracker.sensors.location_recognition.LocationData
 import it.torino.tracker.utils.Utils
@@ -52,11 +57,13 @@ data class TimeSeriesData(val timestamp: Long, val cadence: Int)
 
 
 @Composable
-fun MapViewComposable(myViewModel: MyViewModel, innerPadding: PaddingValues) {
+fun MapViewComposable(myViewModel: MyViewModel, interfaceViewModel: InterfaceViewModel, innerPadding: PaddingValues) {
     val currentIndex = myViewModel.currentTripIndex.observeAsState().value ?: 0
     //    LaunchedEffect(currentIndex) {
     //        Log.d("ComposeDebug", "Recomposing with currentIndex: $currentIndex")
     //    }
+    val showMarkers by interfaceViewModel.showMarkers.collectAsState()
+
     val locationsX = myViewModel.tripsList?.value?.getOrNull(myViewModel.currentTripIndex.value ?: 0)?.locations ?: emptyList()
     ConstraintLayout(modifier = Modifier
         .padding(innerPadding)
@@ -86,7 +93,12 @@ fun MapViewComposable(myViewModel: MyViewModel, innerPadding: PaddingValues) {
                     height = Dimension.percent(0.60f)
                 }
         ) {
-            DrawMap(locationsX)
+            DrawMap(locationsX, showMarkers)
+            LaunchedEffect(Unit) {
+                // This is an example where you might wait for a certain condition or event
+                // You could also use other events or conditions to set this state
+                interfaceViewModel.setShowMarkers(true)
+            }
             if (myViewModel.currentTripIndex.value!! > 1)
                 ArrowInCircle(
                     Icons.Filled.ArrowBack,
@@ -132,7 +144,7 @@ fun getTimeSeriesData(viewModel: MyViewModel, currentIndex: Int): List<TimeSerie
 }
 
 @Composable
-fun DrawMap(locationsX: List<LocationData>?) {
+fun DrawMap(locationsX: List<LocationData>?, showMarkers: Boolean) {
     AndroidView(
         modifier = Modifier.fillMaxSize(), // This should make the AndroidView fill the Box
 
@@ -151,80 +163,88 @@ fun DrawMap(locationsX: List<LocationData>?) {
                 }
             }
         }, update = { mapView ->
-            mapView.getMapAsync { googleMap ->
-                // Clear the map to remove old markers if they are no longer relevant
-                googleMap.clear()
+            if (showMarkers) {
+                mapView.getMapAsync { googleMap ->
+                    // Clear the map to remove old markers if they are no longer relevant
+                    googleMap.clear()
 
-                val builder = LatLngBounds.Builder()
-                val pattern = listOf(Dash(15f), Gap(10f))
+                    val builder = LatLngBounds.Builder()
+                    val pattern = listOf(Dash(15f), Gap(10f))
 
-                var prevMarker: LatLng? = null
-                // Add markers for each location in the list
-                locationsX!!.forEach { location ->
-                    val latLng = LatLng(location.latitude, location.longitude)
+                    var prevMarker: LatLng? = null
+                    // Add markers for each location in the list
+                    locationsX!!.forEach { location ->
+                        val latLng = LatLng(location.latitude, location.longitude)
 //                                googleMap.addMarker(
 //                                    MarkerOptions()
 //                                        .position(latLng)
 //                                        .title("Marker at ${location.latitude}, ${location.longitude}")
 //                                )
-                    val circleOptions = CircleOptions()
-                        .center(latLng)
-                        .strokeColor(AndroidColor.BLUE) // Using Android's Color class
-                        .fillColor(AndroidColor.BLUE)  // Using Android's Color class
-                        // the radius is in meters
-                        .radius(2.0)
+                        val circleOptions = CircleOptions()
+                            .center(latLng)
+                            .strokeColor(AndroidColor.BLUE) // Using Android's Color class
+                            .fillColor(AndroidColor.BLUE)  // Using Android's Color class
+                            // the radius is in meters
+                            .radius(2.0)
 
-                    // Add the circle to your Google Map instance
-                    googleMap.addCircle(circleOptions)
-                    if (prevMarker != null) {
-                        googleMap.addPolyline(
-                            PolylineOptions()
-                                .add(prevMarker, latLng)
-                                .width(5f)
-                                .pattern(pattern)
-                                .color(AndroidColor.BLUE)
-                        )
+                        // Add the circle to your Google Map instance
+                        googleMap.addCircle(circleOptions)
+                        if (prevMarker != null) {
+                            googleMap.addPolyline(
+                                PolylineOptions()
+                                    .add(prevMarker, latLng)
+                                    .width(5f)
+                                    .pattern(pattern)
+                                    .color(AndroidColor.BLUE)
+                            )
+                        }
+                        prevMarker = latLng
+                        builder.include(latLng) // Include location in bounds
                     }
-                    prevMarker = latLng
-                    builder.include(latLng) // Include location in bounds
-                }
 
-                // Optionally, move the camera to the first location
-                if (locationsX.isNotEmpty()) {
-                    val bounds = builder.build()
-                    val padding =
-                        100
+                    // Optionally, move the camera to the first location
+                    if (locationsX.isNotEmpty()) {
+                        val bounds = builder.build()
+                        val padding =
+                            100
 //                    100 + innerPadding.calculateTopPadding().value.toInt() // Offset from edges of the map in pixels
-                    // Animate the camera to show all markers within the bounds, including padding.
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
-                        bounds,
-                        padding
-                    ),
-                        object : GoogleMap.CancelableCallback {
-                            override fun onFinish() {
-                                // This method is called when the camera has finished moving
-                                if (googleMap.cameraPosition.zoom > 18f) {
-                                    // If zoom is greater than 14, adjust to 13
-                                    googleMap.animateCamera(
-                                        CameraUpdateFactory.zoomTo(
-                                            18f
+                        // Animate the camera to show all markers within the bounds, including padding.
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
+                            bounds,
+                            padding
+                        ),
+                            object : GoogleMap.CancelableCallback {
+                                override fun onFinish() {
+                                    // This method is called when the camera has finished moving
+                                    if (googleMap.cameraPosition.zoom > 18f) {
+                                        // If zoom is greater than 14, adjust to 13
+                                        googleMap.animateCamera(
+                                            CameraUpdateFactory.zoomTo(
+                                                18f
+                                            )
                                         )
-                                    )
+                                    }
                                 }
-                            }
 
-                            override fun onCancel() {
-                                // Called if the animateCamera call is canceled for some reason
-                            }
-                        })
+                                override fun onCancel() {
+                                    // Called if the animateCamera call is canceled for some reason
+                                }
+                            })
+                    }
                 }
             }
-
         }
     )
 }
 
-
+fun centerMapOnLocation(map: GoogleMap, latitude: Double, longitude: Double, zoomLevel: Float = 14f) {
+    val location = LatLng(latitude, longitude)
+    val cameraPosition = CameraPosition.Builder()
+        .target(location)      // Sets the center of the map to location
+        .zoom(zoomLevel)       // Sets the zoom
+        .build()               // Creates a CameraPosition from the builder
+    map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+}
 @Composable
 fun TimeSeriesBarChart(data: List<TimeSeriesData>, modifier: Modifier = Modifier) {
     if (data.isEmpty()) return // Handle empty data gracefully
@@ -358,6 +378,7 @@ private fun PreviewMap() {
     MobinTheme {
 
         val viewModel = MyViewModel(LocalContext.current)
+        val interfaceViewModel = InterfaceViewModel(LocalContext.current)
         val locations: List<LocationData> = listOf(
             LocationData(
                 Utils.midnightinMsecs(System.currentTimeMillis() + 1000),
@@ -372,7 +393,7 @@ private fun PreviewMap() {
                 54.022, -1.20, 30.0, 108.0
             ),
         )
-        MapViewComposable(viewModel, PaddingValues(16.dp))
+        MapViewComposable(viewModel, interfaceViewModel, PaddingValues(16.dp))
         viewModel.setRelevantLocations(locations)
     }
 
