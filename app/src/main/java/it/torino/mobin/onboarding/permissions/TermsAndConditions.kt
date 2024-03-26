@@ -31,7 +31,7 @@ fun TermsAndConditions(navController: NavHostController) {
     if (isPreferenceEnabled) {
         var target = "Home"
         if (arePermissionsToBeRequested())
-            target= "Permissions"
+            target= "Location Permissions"
         navController.navigate(target) {
             navController.popBackStack()
         }

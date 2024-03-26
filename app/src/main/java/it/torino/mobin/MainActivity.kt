@@ -1,5 +1,6 @@
 package it.torino.mobin
 
+import LocationPermissionsComposable
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,9 +19,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import it.torino.mobin.onboarding.permissions.ActivityRecognitionPermissions
 import it.torino.mobin.onboarding.permissions.BatteryOptimisation
 import it.torino.mobin.onboarding.permissions.TermsAndConditions
-import it.torino.mobin.onboarding.permissions.MainPermissionsComposable
 import it.torino.mobin.onboarding.permissions.PrivacyPolicy
 import it.torino.mobin.onboarding.permissions.arePermissionsToBeRequested
 import it.torino.mobin.onboarding.permissions.privacyPolicyShown
@@ -60,7 +61,7 @@ class MainActivity : ComponentActivity() {
                         secondDestination= "T&Cs"
                     } else if (arePermissionsToBeRequested()) {
                         startDestination = "onboarding"
-                        secondDestination = "Permissions"
+                        secondDestination = "Location Permissions"
                     }
 
                     NavHost(navController = navController, startDestination = startDestination) {
@@ -74,8 +75,11 @@ class MainActivity : ComponentActivity() {
                             composable("T&Cs") {
                                 TermsAndConditions(navController)
                             }
-                            composable("Permissions") {
-                                MainPermissionsComposable(activity, navController, viewModel)
+                            composable("Location Permissions") {
+                                LocationPermissionsComposable(navController)
+                            }
+                            composable("Activity Permissions") {
+                                ActivityRecognitionPermissions(activity, navController, viewModel)
                             }
                             composable("Battery_optimisation"){
                                 BatteryOptimisation(activity, navController)

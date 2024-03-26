@@ -3,7 +3,9 @@ package it.torino.mobin.onboarding.permissions
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,12 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import it.torino.mobin.R
-import it.torino.mobin.ui.theme.DoubleSpacerHeight
 import it.torino.mobin.ui.theme.MediumPadding
 import it.torino.mobin.ui.theme.SmallPadding
 import it.torino.mobin.ui.theme.SpacerHeight
@@ -51,7 +54,7 @@ fun PrivacyPolicy(navController: NavHostController) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top=SmallPadding)
+            .padding(MediumPadding)
     ) {
         val (title, card, tcs, button) = createRefs()
         Text(
@@ -67,34 +70,27 @@ fun PrivacyPolicy(navController: NavHostController) {
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
         )
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-                .padding(MediumPadding)
+
+        Box(
+            modifier = Modifier.border(width = 2.dp, color = MaterialTheme.colorScheme.primary)
                 .constrainAs(card) {
                     top.linkTo(title.bottom)
                     start.linkTo(title.start)
                     end.linkTo(parent.end)
                     height = Dimension.percent(0.6f)
-                },
-            shape = RoundedCornerShape(size = 20.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 10.dp
-            )
+                }
+                .padding(MediumPadding)
+
         ) {
             val numbers = (0..10).toList()
-            LazyColumn(
-                modifier = Modifier
-                    .padding(vertical = marginVertical)
-            ) {
+            LazyColumn (modifier = Modifier.padding(SmallPadding)) {
                 itemsIndexed(numbers) { index, item ->
                     when (item) {
                         0 -> Text(
                             LocalContext.current.getString(R.string.privacy_policy),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(MediumPadding)
+                                .padding(bottom= SmallPadding)
                                 .clickable {
                                     openUrl(
                                         context,
@@ -102,15 +98,17 @@ fun PrivacyPolicy(navController: NavHostController) {
                                     )
                                 },
                             color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.titleMedium.copy(textAlign = TextAlign.Center,
-                                textDecoration = TextDecoration.Underline),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                textAlign = TextAlign.Center,
+                                textDecoration = TextDecoration.Underline
+                            ),
                         )
 
                         else -> Text(
                             DynamicStringResourceBuilder(item),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(MediumPadding),
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Justify,
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyMedium,
                         )
@@ -118,15 +116,17 @@ fun PrivacyPolicy(navController: NavHostController) {
                 }
             }
         }
-        Row(modifier=Modifier.fillMaxWidth()
-            .padding(start= MediumPadding)
-            .constrainAs(tcs) {
-                top.linkTo(card.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                height = Dimension.percent(0.1f)
-            },
-            verticalAlignment= Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(tcs) {
+                    top.linkTo(card.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.percent(0.1f)
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(text = context.getString(R.string.accept_privacy))
             Checkbox(
                 checked = acceptedTCs,
@@ -141,12 +141,12 @@ fun PrivacyPolicy(navController: NavHostController) {
             top.linkTo(tcs.bottom)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
-            height = Dimension.percent(0.1f)
         }
-        CustomButton(modifier, context.getString(R.string.next),
-                contentColour = if (acceptedTCs) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
-                containerColour = if (acceptedTCs) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                consecutiveButtons = false,
+        CustomButton(
+            modifier, context.getString(R.string.next),
+            contentColour = if (acceptedTCs) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
+            containerColour = if (acceptedTCs) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+            consecutiveButtons = false,
         ) {
             if (acceptedTCs)
                 navController.navigate("T&Cs") {
@@ -193,4 +193,11 @@ fun setPrivacyPolicyShown(context:Context, preferencesManager: PreferencesManage
     val myPreferenceKey = context.getString(R.string.policy_shown_key)
     // Check and react to the permission state
     return preferencesManager.setBoolean(myPreferenceKey, true)
+}
+
+@Preview
+@Composable
+private fun PreviewXXX() {
+    val navController = rememberNavController()
+    PrivacyPolicy(navController)
 }
