@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.logging.Logger
 
 class StepCounter internal constructor(
     private var context: Context?
@@ -29,6 +30,7 @@ class StepCounter internal constructor(
     var stepsDataList: MutableList<StepsData> = mutableListOf()
     var sensorValuesList: MutableList<StepsData> = mutableListOf()
     val _tag = this::class.java.simpleName
+    private var lastUpdateTimestamp: Long = 0
 
     companion object {
         var WAITING_TIME_IN_MSECS = 10000
@@ -141,10 +143,17 @@ class StepCounter internal constructor(
         return object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
                 if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                    sensorValuesList.add(StepsData(Utils.fromEventTimeToEpoch(event.timestamp), event.values[0].toInt()))
-                    if (sensorValuesList.size > MAX_SENSOR_VALUE_LIST_SIZE) {
-                        selectBestSensorValue(sensorValuesList)
-                        sensorValuesList = mutableListOf()
+                    val currentTime = Utils.fromEventTimeToEpoch(event.timestamp)
+//                    Log.i("XXX", "steps: ${event.values[0].toInt()} diff: ${(currentTime - lastUpdateTimestamp)}")
+                    // Check if X seconds have passed since the last update
+                    // note: sensor readsing may come in order different from the
+                    // temporal one - sometimes they come in an unordered way
+                    // so this may need some checking
+                    if ((currentTime - lastUpdateTimestamp) >= WAITING_TIME_IN_MSECS) {
+                        val stpData= StepsData(currentTime, event.values[0].toInt())
+                        storeSteps(stpData)
+//                        Log.i("XXX", "inserted: $stpData")
+                        lastUpdateTimestamp = currentTime // Update the last processed time
                     }
                 }
             }

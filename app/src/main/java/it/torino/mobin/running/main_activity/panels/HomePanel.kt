@@ -26,6 +26,7 @@ import it.torino.mobin.R
 import it.torino.mobin.ui.theme.DoubleSpacerHeight
 import it.torino.mobin.ui.theme.White
 import it.torino.mobin.running.ui_elements.StepsProgressDial
+import it.torino.mobin.ui.theme.SpacerHeight
 import it.torino.tracker.view_model.MyViewModel
 
 const val heartMinutesTarget = 40
@@ -90,7 +91,7 @@ fun HomePanel(
                     text = "${heartMinutes.toInt()} ${LocalContext.current.getString(R.string.heart_minutes)}",
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(top= SpacerHeight)
                 )
 
             }

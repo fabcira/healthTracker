@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import it.torino.mobin.ui.theme.MediumPadding
+import it.torino.mobin.ui.theme.SmallPadding
 
 /**
  * MaterialTheme.colorScheme.primary
@@ -23,10 +24,11 @@ fun CustomButton(
     text: String,
     containerColour: Color,
     contentColour: Color,
+    consecutiveButtons: Boolean = false,
     onButtonClick: () -> Unit
 ) {
     Button(
-        modifier = modifier.fillMaxWidth().padding(MediumPadding),
+        modifier = modifier.fillMaxWidth().padding(if (consecutiveButtons) SmallPadding else MediumPadding),
         onClick = { onButtonClick() },
         shape = RoundedCornerShape(8.dp), // Adjust the corner size as needed
         colors = ButtonDefaults.buttonColors(

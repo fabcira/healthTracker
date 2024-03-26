@@ -145,7 +145,8 @@ fun PrivacyPolicy(navController: NavHostController) {
         }
         CustomButton(modifier, context.getString(R.string.next),
                 contentColour = if (acceptedTCs) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
-                containerColour = if (acceptedTCs) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                containerColour = if (acceptedTCs) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                consecutiveButtons = false,
         ) {
             if (acceptedTCs)
                 navController.navigate("T&Cs") {

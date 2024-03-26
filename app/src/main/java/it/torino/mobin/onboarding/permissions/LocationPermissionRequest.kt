@@ -64,13 +64,13 @@ fun ForegroundLocationPermissions(permissionRequested: Boolean,
 @Composable
 fun getTexts(): List<Unit> {
     return listOf(
-        Text(
-            LocalContext.current.getString(R.string.onboarding_location_0),
-            modifier = Modifier.fillMaxWidth()
-                .padding(MediumPadding),
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyMedium,
-        ),
+//        Text(
+//            LocalContext.current.getString(R.string.onboarding_location_0),
+//            modifier = Modifier.fillMaxWidth()
+//                .padding(MediumPadding),
+//            color = MaterialTheme.colorScheme.onBackground,
+//            style = MaterialTheme.typography.bodyMedium,
+//        ),
 //        Text(
 //            LocalContext.current.getString(R.string.onboarding_location_1),
 //            modifier = Modifier.fillMaxWidth()

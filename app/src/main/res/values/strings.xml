@@ -58,13 +58,17 @@
     <string name="accept_privacy">Accept The Privacy Policy?</string>
 
     <string name="onboarding_description_first_install">In order to use the %1$s app, some permissions and the privacy policy need to be accepted. Please click on the continue button and follow the next steps to complete the configuration</string>
-    <string name="onboarding_location_0"><![CDATA[In order to accurately record your activity the app needs to access the Physical Activity and Location data stored on your mobile device.<br>Please follow the instructions below when the permissions are shown.]]></string>
-    <string name="onboarding_location_1"><![CDATA[1. Allow the app to access your physical activity?<br>2. Click on Allow.]]></string>
-    <string name="onboarding_location_2"><![CDATA[The app collects location data to enable accurate activity tracking even when the app is closed or not in use. For each of your activities a map is provided showing the route followed for a specific activity.<br><br>Follow the instructions below to enable location services running in the background:<br>1. Allow Moving Health to access this device’s location?<br>2. Click on <b>While using the app</b><br>3. Location Permission must be set to <b>Allow all the time</b>]]></string>
+    <string name="onboarding_location_0"><![CDATA[In order to accurately record your activity the app needs to access the Physical Activity and Location data stored on your mobile device.\nPlease follow the instructions below when the permissions are shown.]]></string>
+    <string name="onboarding_location_1"><![CDATA[1. Allow the app to access your physical activity?\n2. Click on Allow.]]></string>
+    <string name="onboarding_location_2"><![CDATA[The app collects location data to enable accurate activity tracking even when the app is closed or not in use. For each of your activities a map is provided showing the route followed for a specific activity.\n\nFollow the instructions below to enable location services running in the background:\n1. Allow Moving Health to access this device’s location?\n2. Click on While using the app\n3. Location Permission must be set to Allow all the time]]></string>
 
     <string name="physical_activity">Physical Activity *</string>
     <string name="physical_activity_permission">I agree to give access to my physical activity data. This does not include any GPS data.</string>
     <string name="accept_tcs">Accept Terms and Conditions?</string>
     <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="open_battery_permissions">"Open Battery Permissions"</string>
+    <string name="battery_permissions">"Battery Settings"</string>
+    <string name="battery_settings_description"><![CDATA[The app has to run continuously in order to collect accurate data.\n\nClick on Check Settings and follow the instructions below:\n\n1. Open the Settings app on your device and select Battery (or Battery Management)\n2. Select No restrictions (typically it is top item)]]></string>
+    <string name="battery_drainage_description"><![CDATA[In the future, your device may display a message informing you that the app uses power in the background and may drain the battery. Ignore that warning. The app has to run continuously in order to collect more accurate data]]></string>
 
 </resources>
