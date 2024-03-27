@@ -8,10 +8,10 @@ package it.torino.tracker.data_upload.data_senders
 import android.content.Context
 import android.util.Log
 import it.torino.tracker.data_upload.HttpsServer
-import it.torino.tracker.data_upload.dts_data.LocationDataDTS
 import it.torino.tracker.tracker.sensors.location_recognition.LocationData
 import it.torino.tracker.utils.Globals
 import org.json.JSONObject
+import uk.ac.shef.tracker.core.serialization.LocationsRequest
 
 class LocationDataSender(val context: Context) {
     private val TAG: String = javaClass.simpleName
@@ -56,10 +56,10 @@ class LocationDataSender(val context: Context) {
         locationsToSend = collectLocationsFromDatabase()
         if (locationsToSend != null && locationsToSend!!.isNotEmpty()) {
             Log.i(TAG, "Sending ${locationsToSend!!.size} locations")
-            val locationsDTSList: MutableList<LocationDataDTS> = mutableListOf()
+            val locationsDTSList: MutableList<LocationsRequest.LocationRequest> = mutableListOf()
             for (location in locationsToSend!!)
                 if (location != null) {
-                    locationsDTSList.add(LocationDataDTS(location))
+                    locationsDTSList.add(LocationsRequest.LocationRequest(location))
                 }
             val dataSenderUtils = DataSenderUtils()
             Log.i(TAG, "about to send: ${dataSenderUtils.getJSONArrayOfObjects(locationsDTSList)}")

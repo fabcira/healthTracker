@@ -17,6 +17,7 @@ import it.torino.tracker.utils.Globals
 import it.torino.tracker.utils.PreferencesStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import uk.ac.shef.tracker.core.serialization.TripsRequest
 
 class DataUploadWorker(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
     private val TAG: String? = this::class.simpleName
@@ -59,8 +60,6 @@ class DataUploadWorker(val context: Context, workerParams: WorkerParameters) : C
             stepsDataSender.sendStepData(userId)
             val hrDataSender = HeartRateDataSender(context)
             hrDataSender.sendHeartRateData(userId)
-            val symptomsDataSender = SymptomsDataSender(context)
-            symptomsDataSender.sendSymptomsData(userId)
 
             val useMobilityModelling = preference.getBooleanPreference(context, Globals.USE_MOBILITY_MODELLING, true)
             Log.i(TAG, "About to send trips: shall we? $useMobilityModelling")

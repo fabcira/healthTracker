@@ -9,10 +9,10 @@ import android.content.Context
 import android.util.Log
 import it.torino.tracker.Repository
 import it.torino.tracker.data_upload.HttpsServer
-import it.torino.tracker.data_upload.dts_data.ActivityDataDTS
 import it.torino.tracker.tracker.sensors.activity_recognition.ActivityData
 import it.torino.tracker.utils.Globals
 import org.json.JSONObject
+import uk.ac.shef.tracker.core.serialization.ActivitiesRequest
 
 class ActivityDataSender(val context: Context) {
     private val TAG: String? = this::class.simpleName
@@ -47,9 +47,9 @@ class ActivityDataSender(val context: Context) {
         activitiesToSend = collectActivitiesFromDatabase()
         if (activitiesToSend != null && activitiesToSend!!.isNotEmpty()) {
             Log.i(TAG, "Sending ${activitiesToSend!!.size} activities")
-            val activityDTSList: MutableList<ActivityDataDTS> = mutableListOf()
+            val activityDTSList: MutableList<ActivitiesRequest.ActivityRequest> = mutableListOf()
             for (activity in activitiesToSend!!)
-                if (activity != null) activityDTSList.add(ActivityDataDTS(activity))
+                if (activity != null) activityDTSList.add(ActivitiesRequest.ActivityRequest(activity))
             val dataSenderUtils = DataSenderUtils()
             dataObject.put(Globals.ACTIVITIES_ON_SERVER, dataSenderUtils.getJSONArrayOfObjects(activityDTSList))
             return dataObject

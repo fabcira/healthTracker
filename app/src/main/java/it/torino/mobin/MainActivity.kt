@@ -1,6 +1,7 @@
 package it.torino.mobin
 
 import LocationPermissionsComposable
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,9 +22,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import it.torino.mobin.onboarding.permissions.ActivityRecognitionPermissions
 import it.torino.mobin.onboarding.permissions.BatteryOptimisation
+import it.torino.mobin.onboarding.permissions.BatteryPermissionsRemoval
 import it.torino.mobin.onboarding.permissions.TermsAndConditions
 import it.torino.mobin.onboarding.permissions.PrivacyPolicy
+import it.torino.mobin.onboarding.permissions.activityRecognitionPermissionGranted
 import it.torino.mobin.onboarding.permissions.arePermissionsToBeRequested
+import it.torino.mobin.onboarding.permissions.batteryOptimisationRemoved
+import it.torino.mobin.onboarding.permissions.batteryPermissionsRemovalUnlinked
 import it.torino.mobin.onboarding.permissions.privacyPolicyShown
 import it.torino.mobin.onboarding.permissions.termsAndConditionsAccepted
 import it.torino.mobin.ui.theme.MobinTheme
@@ -44,6 +49,7 @@ class MainActivity : ComponentActivity() {
             MobinTheme {
                 val context = LocalContext.current
                 CompositionLocalProvider(LocalPreferencesManager provides PreferencesManager(context)) {
+                    val preferencesManager = LocalPreferencesManager.current
                     val interfaceViewModelFactory = InterfaceViewModelFactory(LocalContext.current)
                     val interfaceViewModel: InterfaceViewModel by viewModels { interfaceViewModelFactory }
                     val myViewModelFactory = MyViewModelFactory(LocalContext.current)
@@ -51,18 +57,10 @@ class MainActivity : ComponentActivity() {
 
 //                    viewModel.setCurrentDateTime(System.currentTimeMillis()-MSECS_IN_A_DAY)
                     val navController = rememberNavController()
-                    var startDestination = "running"
-                    var secondDestination = "Home"
-                    if (!privacyPolicyShown(LocalPreferencesManager.current)) {
-                        startDestination = "onboarding"
-                        secondDestination= "Privacy_Policy"
-                    } else if (!termsAndConditionsAccepted()) {
-                        startDestination = "onboarding"
-                        secondDestination= "T&Cs"
-                    } else if (arePermissionsToBeRequested()) {
-                        startDestination = "onboarding"
-                        secondDestination = "Location Permissions"
-                    }
+                    var startDestination = "onboarding"
+                    val secondDestination = getNextNavigationRouteDuringOnboarding(LocalContext.current, preferencesManager)
+                    if (secondDestination == "Home")
+                        startDestination="running"
 
                     NavHost(navController = navController, startDestination = startDestination) {
                         navigation(
@@ -70,24 +68,28 @@ class MainActivity : ComponentActivity() {
                             route = "onboarding"
                         ) {
                             composable("Privacy_Policy"){
-                                PrivacyPolicy(navController)
+                                PrivacyPolicy(navController, preferencesManager)
                             }
                             composable("T&Cs") {
-                                TermsAndConditions(navController)
+                                TermsAndConditions(navController, preferencesManager)
                             }
                             composable("Location Permissions") {
-                                LocationPermissionsComposable(navController)
+                                LocationPermissionsComposable(navController, preferencesManager)
                             }
                             composable("Activity Permissions") {
-                                ActivityRecognitionPermissions(activity, navController, viewModel)
+                                ActivityRecognitionPermissions(activity, navController, viewModel, preferencesManager)
                             }
                             composable("Battery_optimisation"){
-                                BatteryOptimisation(activity, navController)
+                                BatteryOptimisation(navController, preferencesManager)
                             }
+                            composable("Battery_permissions_removal"){
+                                BatteryPermissionsRemoval(navController, preferencesManager)
+                            }
+
                         }
                         navigation(startDestination = secondDestination, route = "running") {
                             composable("Home") {
-                                MainContainer(activity, viewModel, interfaceViewModel)
+                                MainContainer(activity, viewModel, interfaceViewModel, preferencesManager)
                             }
                         }
                     }
@@ -98,6 +100,27 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * it chooses teh next onboarding route given teh status of the permissions
+ */
+fun getNextNavigationRouteDuringOnboarding(context: Context, preferencesManager: PreferencesManager): String{
+    var secondDestination = "Home"
+
+    if (!privacyPolicyShown(context, preferencesManager)) {
+        secondDestination= "Privacy_Policy"
+    } else if (!termsAndConditionsAccepted(context, preferencesManager)) {
+        secondDestination= "T&Cs"
+    } else if ((Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)  && arePermissionsToBeRequested(context, preferencesManager)) {
+        secondDestination = "Location Permissions"
+    } else if (!activityRecognitionPermissionGranted(context)){
+        secondDestination = "Activity Permissions"
+    } else if(!batteryOptimisationRemoved(context, preferencesManager)){
+        secondDestination = "Battery_optimisation"
+    } else if(!batteryPermissionsRemovalUnlinked(context, preferencesManager)){
+        secondDestination = "Battery_permissions_removal"
+    }
+    return secondDestination
+}
 //@Composable
 //fun SimulateRunning(goalSteps: Int) {
 //    var progress by remember { mutableStateOf(0f) }

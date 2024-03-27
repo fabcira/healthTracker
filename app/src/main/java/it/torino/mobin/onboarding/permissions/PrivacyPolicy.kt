@@ -7,15 +7,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,18 +32,17 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import it.torino.mobin.R
+import it.torino.mobin.getNextNavigationRouteDuringOnboarding
 import it.torino.mobin.ui.theme.MediumPadding
 import it.torino.mobin.ui.theme.SmallPadding
 import it.torino.mobin.ui.theme.SpacerHeight
-import it.torino.mobin.ui.theme.marginVertical
 import it.torino.mobin.utils.CustomButton
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
 
 @Composable
-fun PrivacyPolicy(navController: NavHostController) {
+fun PrivacyPolicy(navController: NavHostController, preferencesManager: PreferencesManager) {
     val context = LocalContext.current
-    val preferencesManager = LocalPreferencesManager.current
     val myPreferenceKey = LocalContext.current.getString(R.string.my_preference_key)
     val isPreferenceEnabled = preferencesManager.getBoolean(myPreferenceKey)
     var acceptedTCs by remember { mutableStateOf(false) }
@@ -148,11 +143,17 @@ fun PrivacyPolicy(navController: NavHostController) {
             containerColour = if (acceptedTCs) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
             consecutiveButtons = false,
         ) {
-            if (acceptedTCs)
-                navController.navigate("T&Cs") {
-                    setPrivacyPolicyShown(context, preferencesManager)
+            if (acceptedTCs) {
+                setPrivacyPolicyShown(context, preferencesManager)
+                val nextDestination = getNextNavigationRouteDuringOnboarding(context, preferencesManager)
+                navController.navigate(nextDestination) {
                     navController.popBackStack()
                 }
+//                navController.navigate("T&Cs") {
+//                    setPrivacyPolicyShown(context, preferencesManager)
+//                    navController.popBackStack()
+//                }
+            }
         }
     }
 }
@@ -183,9 +184,8 @@ fun DynamicStringResourceBuilder(index: Int): String {
 
     return privacyPolicyString
 }
-@Composable
-fun privacyPolicyShown(preferencesManager: PreferencesManager): Boolean {
-    val myPreferenceKey = LocalContext.current.getString(R.string.policy_shown_key)
+fun privacyPolicyShown(context: Context, preferencesManager: PreferencesManager): Boolean {
+    val myPreferenceKey = context.getString(R.string.policy_shown_key)
     // Check and react to the permission state
     return preferencesManager.getBoolean(myPreferenceKey)
 }
@@ -199,5 +199,7 @@ fun setPrivacyPolicyShown(context:Context, preferencesManager: PreferencesManage
 @Composable
 private fun PreviewXXX() {
     val navController = rememberNavController()
-    PrivacyPolicy(navController)
+    val preferencesManager = LocalPreferencesManager.current
+
+    PrivacyPolicy(navController, preferencesManager)
 }

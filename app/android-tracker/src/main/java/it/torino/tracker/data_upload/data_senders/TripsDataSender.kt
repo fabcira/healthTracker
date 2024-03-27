@@ -8,13 +8,13 @@ package it.torino.tracker.data_upload.data_senders
 import android.content.Context
 import android.util.Log
 import it.torino.tracker.data_upload.HttpsServer
-import it.torino.tracker.data_upload.dts_data.TripDataDTS
 import it.torino.tracker.retrieval.ComputeDayDataAsync
 import it.torino.tracker.retrieval.data.TripData
 import it.torino.tracker.utils.Globals
 import it.torino.tracker.utils.PreferencesStore
 import it.torino.tracker.utils.Utils
 import org.json.JSONObject
+import uk.ac.shef.tracker.core.serialization.TripsRequest
 
 class TripsDataSender(val context: Context) {
     private val TAG: String? = this::class.simpleName
@@ -72,9 +72,9 @@ class TripsDataSender(val context: Context) {
             true
         } else {
             Log.i(TAG, "Sending ${tripsToSend.size} trips")
-            val tripsDTSList: MutableList<TripDataDTS> = mutableListOf()
+            val tripsDTSList: MutableList<TripsRequest.TripRequest> = mutableListOf()
             for (trip in tripsToSend)
-                tripsDTSList.add(TripDataDTS(trip))
+                tripsDTSList.add(TripsRequest.TripRequest(trip))
             val dataSenderUtils = DataSenderUtils()
             dataObject.put(
                 Globals.TRIPS_ON_SERVER,

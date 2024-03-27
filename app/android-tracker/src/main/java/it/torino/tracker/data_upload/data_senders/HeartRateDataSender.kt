@@ -9,11 +9,11 @@ import android.content.Context
 import android.util.Log
 import it.torino.tracker.Repository
 import it.torino.tracker.data_upload.HttpsServer
-import it.torino.tracker.data_upload.dts_data.HeartRateDataDTS
 import it.torino.tracker.tracker.sensors.heart_rate_monitor.HeartRateData
 import it.torino.tracker.utils.Globals
 import it.torino.tracker.utils.Utils
 import org.json.JSONObject
+import uk.ac.shef.tracker.core.serialization.HeartRatesRequest
 
 class HeartRateDataSender(val context: Context) {
     private val TAG: String? = this::class.simpleName
@@ -54,10 +54,10 @@ class HeartRateDataSender(val context: Context) {
         heartRatesToSend = collectHeartRatesFromDatabase()
         if (heartRatesToSend != null && heartRatesToSend!!.isNotEmpty()) {
             Log.i(TAG, "Sending ${heartRatesToSend!!.size} heartRates")
-            val heartRatesDTSList: MutableList<HeartRateDataDTS> = mutableListOf()
+            val heartRatesDTSList: MutableList<HeartRatesRequest.HeartRateRequest> = mutableListOf()
             for (heartRateData in heartRatesToSend!!)
                 if (heartRateData != null)
-                    heartRatesDTSList.add(HeartRateDataDTS(heartRateData))
+                    heartRatesDTSList.add(HeartRatesRequest.HeartRateRequest(heartRateData))
             val dataSenderUtils = DataSenderUtils()
             dataObject.put(Globals.HEART_RATES_ON_SERVER, dataSenderUtils.getJSONArrayOfObjects(heartRatesDTSList))
             return dataObject

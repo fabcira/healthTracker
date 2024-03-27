@@ -2,7 +2,6 @@ package it.torino.mobin.running.main_activity
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -72,15 +71,15 @@ import it.torino.mobin.running.main_activity.panels.TripsScreen
 import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.tracker.view_model.MyViewModel
 import java.util.Calendar
-import androidx.activity.viewModels
-import it.torino.mobin.utils.InterfaceViewModelFactory
+import it.torino.mobin.utils.PreferencesManager
 
 
 @Composable
 fun MainContainer(
     activity: MainActivity,
     viewModel: MyViewModel,
-    interfaceViewModel: InterfaceViewModel
+    interfaceViewModel: InterfaceViewModel,
+    preferencesManager: PreferencesManager
 ) {
     val context = LocalContext.current
     val navController: NavHostController = rememberNavController()
