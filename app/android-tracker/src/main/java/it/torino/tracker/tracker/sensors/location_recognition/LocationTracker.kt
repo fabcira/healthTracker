@@ -14,14 +14,20 @@ import android.location.Location
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.gms.location.*
+import it.torino.tracker.Repository
 import it.torino.tracker.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class LocationTracker(context: Context) {
+class LocationTracker(
+    context: Context,
+    lifecycleScope: LifecycleCoroutineScope,
+    repository: Repository?
+) {
     private val _tag = this::class.java.simpleName
     private var lastRecordedLocation: Location? = null
     // warning: it appears that LocationRequest.create is deprecated in Nov 22

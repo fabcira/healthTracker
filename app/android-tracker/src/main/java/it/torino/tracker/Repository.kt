@@ -6,6 +6,7 @@ package it.torino.tracker
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import it.torino.tracker.database.DAOs.AccelerometerDataDAO
 import it.torino.tracker.database.DAOs.ActivityDataDAO
 import it.torino.tracker.database.DAOs.HeartRateDAO
 import it.torino.tracker.database.DAOs.LocationDataDAO
@@ -21,6 +22,7 @@ class Repository(application: Context?) : ViewModel() {
     val dBActivityDao: ActivityDataDAO?
     val dBLocationDao: LocationDataDAO?
     val dBHeartRateDao: HeartRateDAO?
+    val dBAccelerometerDao: AccelerometerDataDAO?
     val dBSymptomsDao: SymptomsDataDAO?
     val currentHeartRate: MutableLiveData<Int>
     val mobilityChart: MutableLiveData<MobilityResultComputation>?
@@ -58,6 +60,7 @@ class Repository(application: Context?) : ViewModel() {
         dBActivityDao = db.myActivityDataDao()
         dBLocationDao = db.myLocationDataDao()
         dBHeartRateDao = db.myHeartRateDataDao()
+        dBAccelerometerDao= db.myAccelerometerDao()
         dBSymptomsDao = db.mySymptomsDataDao()
 
         currentHeartRate = MutableLiveData<Int>()

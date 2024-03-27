@@ -25,3 +25,4 @@ include(":app")
 println ("Root project directory: ${rootDir}")
 include(":app:android-tracker")
 project(":app:android-tracker").projectDir = file("app/android-tracker")
+

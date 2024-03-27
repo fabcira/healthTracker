@@ -18,6 +18,7 @@ import it.torino.tracker.view_model.MyViewModel
 
 class TrackerManager private constructor(private val activity: Context) {
 
+    private var useAccelerometer: Boolean = false
     private var useBodySensors: Boolean? = false
     private var useLocationTracking: Boolean? = false
     private var useActivityRecognition: Boolean? = false
@@ -71,14 +72,18 @@ class TrackerManager private constructor(private val activity: Context) {
      * to use
      *
      */
-    fun setUpTracker(useStepCounter: Boolean, useActivityRecognition: Boolean, useLocationTracking: Boolean, useBodySensors: Boolean, useMobilityModelling: Boolean, sendData: Boolean) {
+    fun setUpTracker(useStepCounter: Boolean, useActivityRecognition: Boolean, useLocationTracking: Boolean,
+                     useBodySensors: Boolean, useAccelerometer: Boolean, useMobilityModelling: Boolean,
+                     sendData: Boolean) {
         this.useActivityRecognition = useActivityRecognition
         this.useLocationTracking = useLocationTracking
         this.useBodySensors = useBodySensors
+        this.useAccelerometer = useAccelerometer
         this.useStepCounter = useStepCounter
         this.useMobilityModelling = useMobilityModelling
         this.sendData = sendData
-        savePreferences(useStepCounter, useActivityRecognition, useLocationTracking, useBodySensors, useMobilityModelling, sendData)
+        savePreferences(useStepCounter, useActivityRecognition, useLocationTracking, useBodySensors,
+            useAccelerometer, useMobilityModelling, sendData)
 
     }
 
@@ -91,12 +96,15 @@ class TrackerManager private constructor(private val activity: Context) {
      * @param useBodySensors
      * @param sendData
      */
-    private fun savePreferences(useStepCounter: Boolean, useActivityRecognition: Boolean, useLocationTracking: Boolean, useBodySensors: Boolean, useMobilityModelling: Boolean, sendData: Boolean) {
+    private fun savePreferences(useStepCounter: Boolean, useActivityRecognition: Boolean,
+                                useLocationTracking: Boolean, useBodySensors: Boolean, useAccelerometer: Boolean,
+                                useMobilityModelling: Boolean, sendData: Boolean) {
         val preference = PreferencesStore()
         preference.setBooleanPreference(activity, Globals.USE_ACTIVITY_RECOGNITION, useActivityRecognition)
         preference.setBooleanPreference(activity, Globals.USE_LOCATION_TRACKING, useLocationTracking)
         preference.setBooleanPreference(activity, Globals.USE_STEP_COUNTER, useStepCounter)
         preference.setBooleanPreference(activity, Globals.USE_HEART_RATE_MONITOR, useBodySensors)
+        preference.setBooleanPreference(activity, Globals.USE_ACCELEROMETER, useAccelerometer)
         preference.setBooleanPreference(activity, Globals.USE_MOBILITY_MODELLING, useMobilityModelling)
         preference.setBooleanPreference(activity, Globals.SEND_DATA_TO_SERVER, sendData)
     }

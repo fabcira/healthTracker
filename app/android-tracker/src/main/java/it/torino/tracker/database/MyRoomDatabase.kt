@@ -7,16 +7,19 @@
 package it.torino.tracker.database
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import it.torino.tracker.database.DAOs.AccelerometerDataDAO
 import it.torino.tracker.database.DAOs.ActivityDataDAO
 import it.torino.tracker.database.DAOs.HeartRateDAO
 import it.torino.tracker.database.DAOs.LocationDataDAO
 import it.torino.tracker.database.DAOs.StepsDataDAO
 import it.torino.tracker.database.DAOs.SymptomsDataDAO
 import it.torino.tracker.retrieval.data.TripData
+import it.torino.tracker.tracker.sensors.accelerometer.AccelerometerData
 import it.torino.tracker.tracker.sensors.activity_recognition.ActivityData
 import it.torino.tracker.tracker.sensors.heart_rate_monitor.HeartRateData
 import it.torino.tracker.tracker.sensors.location_recognition.LocationData
@@ -25,15 +28,19 @@ import it.torino.tracker.tracker.sensors.symptoms.SymptomsData
 
 @Database(
     entities = [StepsData::class, LocationData::class, ActivityData::class, TripData::class,
-        HeartRateData::class, SymptomsData::class],
-    version = 9,
-    exportSchema = false
+        HeartRateData::class, SymptomsData::class, AccelerometerData::class],
+    version = 10,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 9, to = 10)
+    ]
 )
 abstract class MyRoomDatabase : RoomDatabase() {
     abstract fun myStepDataDao(): StepsDataDAO?
     abstract fun myActivityDataDao(): ActivityDataDAO?
     abstract fun myLocationDataDao(): LocationDataDAO?
     abstract fun myHeartRateDataDao(): HeartRateDAO
+    abstract fun myAccelerometerDao(): AccelerometerDataDAO
 
     abstract fun mySymptomsDataDao(): SymptomsDataDAO
 

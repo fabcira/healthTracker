@@ -17,6 +17,7 @@ fun finaliseOnboarding(context: Context, activity: MainActivity, viewModel: MyVi
         useActivityRecognition = true,
         useLocationTracking = true,
         useBodySensors = false,
+        useAccelerometer = false,
         useMobilityModelling = true,
         sendData = true
     )

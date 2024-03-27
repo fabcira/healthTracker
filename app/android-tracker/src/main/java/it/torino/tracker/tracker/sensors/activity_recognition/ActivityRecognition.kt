@@ -17,8 +17,10 @@ import android.os.Build
 import android.text.TextUtils
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.gms.location.*
 import com.google.android.gms.location.ActivityRecognition
+import it.torino.tracker.Repository
 import it.torino.tracker.tracker.TrackerService
 import it.torino.tracker.utils.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -27,9 +29,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.logging.Logger
 
-class ActivityRecognition(private var callingService: TrackerService) {
+class ActivityRecognition(
+    private var callingService: TrackerService,
+    lifecycleScope: LifecycleCoroutineScope,
+    repository: Repository?
+) {
     private val _tag = this::class.java.simpleName
     private var activityTransitionsReceiver: ActivityTransitionsReceiver? = null
     var activityDataList: MutableList<ActivityData> = mutableListOf()
@@ -266,7 +271,7 @@ class ActivityRecognition(private var callingService: TrackerService) {
      */
      class ActivityTransitionsReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Log.i("A/R", "receicing A/R")
+            Log.i("A/R", "receiving A/R event")
             if (!TextUtils.equals(activityMonitor?.TRANSITIONS_RECEIVER_ACTION, intent.action)) {
                 Log.i(
                     "A/R", "Unsupported action in ActivityTransitionsReceiver: "

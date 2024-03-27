@@ -15,7 +15,13 @@ android {
     defaultConfig {
         minSdk 23
         targetSdk 34
-
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.schemaLocation": "$projectDir/schemas".toString()
+                ]
+            }
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -51,6 +57,7 @@ android {
     namespace 'it.torino.tracker'
 }
 
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.12.0'
@@ -59,6 +66,8 @@ dependencies {
 
     implementation 'androidx.room:room-runtime:2.6.1'
     kapt 'androidx.room:room-compiler:2.6.1'
+    implementation "androidx.room:room-ktx:<version>"
+
     implementation "androidx.sqlite:sqlite:2.4.0"
 
     implementation 'androidx.preference:preference:1.2.1'
@@ -66,11 +75,13 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'com.google.firebase:firebase-common:20.4.2'
+    implementation 'com.google.firebase:firebase-common:20.4.3'
     implementation 'com.google.android.gms:play-services-location:21.2.0'
     implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation "androidx.lifecycle:lifecycle-service:2.7.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
 
-    implementation 'com.google.firebase:firebase-common:20.4.2'
+    implementation 'com.google.firebase:firebase-common:20.4.3'
 
     // WorkManager dependency
     implementation "androidx.work:work-runtime-ktx:2.9.0"

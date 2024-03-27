@@ -4,7 +4,6 @@
  */
 package it.torino.tracker.tracker
 
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -12,10 +11,12 @@ import android.location.Location
 import android.os.*
 import android.os.PowerManager.WakeLock
 import android.util.Log
-import androidx.annotation.RequiresApi
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
 import it.torino.tracker.Repository
+import it.torino.tracker.tracker.sensors.accelerometer.AccelerometerRecognition
 import it.torino.tracker.tracker.sensors.activity_recognition.ActivityData
 import it.torino.tracker.tracker.sensors.activity_recognition.ActivityRecognition
 import it.torino.tracker.tracker.sensors.heart_rate_monitor.HeartRateMonitor
@@ -27,13 +28,14 @@ import it.torino.tracker.utils.Globals
 import it.torino.tracker.utils.PreferencesStore
 
 
-class TrackerService : Service() {
+class TrackerService : LifecycleService() {
     private var savedLocation: Location? = null
     private var isContDownTimerRunning: Boolean = false
     var cntdwntmr: CountDownTimer? = null
     var locationTracker: LocationTracker? = null
     var stepCounter: StepCounter? = null
     var heartMonitor: HeartRateMonitor? = null
+    var accelerometer: AccelerometerRecognition? = null
     var activityRecognition: ActivityRecognition? = null
     private var significantMotionSensor: SignificantMotionSensor? = null
 
@@ -71,19 +73,24 @@ class TrackerService : Service() {
             preference.getBooleanPreference(this, Globals.USE_LOCATION_TRACKING, true)
         val useHRmonitoring =
             preference.getBooleanPreference(this, Globals.USE_HEART_RATE_MONITOR, true)
+        val useAccelerometer =
+            preference.getBooleanPreference(this, Globals.USE_ACCELEROMETER, true)
 
         repository = Repository.getInstance(this)
 
         if (locationTracker == null && useLocationTracking == true)
-            locationTracker = LocationTracker(this)
+            locationTracker = LocationTracker(this, lifecycleScope, repository)
         if (activityRecognition == null && useActivityRecognition == true)
-            activityRecognition = ActivityRecognition(this)
+            activityRecognition = ActivityRecognition(this, lifecycleScope, repository)
         // for the step counter we need to set up the attributiontag context as a context
         if (stepCounter == null && useStepCounter == true)
-            stepCounter = StepCounter(attributionContext)
+            stepCounter = StepCounter(attributionContext, lifecycleScope, repository)
         if (heartMonitor == null && useHRmonitoring == true)
-            // for the hr monitor we need to set up the attributiontag context as a context
-            heartMonitor = HeartRateMonitor(attributionContext, repository)
+        // for the hr monitor we need to set up the attributiontag context as a context
+            heartMonitor = HeartRateMonitor(attributionContext, lifecycleScope, repository)
+        if (accelerometer == null && useAccelerometer == true)
+        // for the hr monitor we need to set up the attributiontag context as a context
+            accelerometer = AccelerometerRecognition(attributionContext, lifecycleScope, repository)
 
         initCountDownToStoppingSensors()
     }
@@ -96,7 +103,7 @@ class TrackerService : Service() {
      * @param startId
      * @return
      */
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         Log.d(TAG, "starting the foreground service...")
         startWakeLock()
@@ -163,9 +170,16 @@ class TrackerService : Service() {
         } catch (e: Exception) {
             Log.e(TAG, "error starting the hr monitor: " + e.message)
         }
+        try {
+            Log.i(TAG, "starting accelerometer ${accelerometer != null}")
+            accelerometer?.startMonitoring()
+        } catch (e: Exception) {
+            Log.e(TAG, "error starting the hr monitor: " + e.message)
+        }
     }
 
     override fun onBind(intent: Intent): IBinder? {
+        super.onBind(intent)
         return null
     }
 
@@ -208,6 +222,11 @@ class TrackerService : Service() {
             locationTracker?.stopLocationTracking()
         } catch (e: Exception) {
             Log.i(TAG, "location tracker did not stop " + e.message)
+        }
+        try {
+            accelerometer?.stopTracking()
+        } catch (e: Exception) {
+            Log.i(TAG, "accelerometer did not stop " + e.message)
         }
     }
 

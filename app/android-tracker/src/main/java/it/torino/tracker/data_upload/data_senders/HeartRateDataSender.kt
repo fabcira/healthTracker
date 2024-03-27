@@ -27,7 +27,7 @@ class HeartRateDataSender(val context: Context) {
      */
     fun sendHeartRateData(userID: String) {
         val dataToSend: JSONObject = prepareHeartRateData(userID) ?: return
-        Log.i(TAG, "heart rates to send: ${dataToSend?.length()}")
+        Log.i(TAG, "heart rates to send: ${dataToSend.length()}")
         val url: String =
             Globals.SERVER_URI + Globals.SERVER_PORT + Globals.SERVER_INSERT_HEART_RATES_URL
         val httpServer = HttpsServer()

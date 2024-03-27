@@ -46,21 +46,21 @@ fun TripsScreen(viewModel: MyViewModel, navController: NavController, innerPaddi
 
 @Composable
 fun TripsList(navController: NavController, viewModel: MyViewModel, items: List<TripData>) {
+    var found = false
     LazyColumn (modifier = Modifier
         .padding(vertical= marginVertical)){
         itemsIndexed(items) { index, item ->
             if (item.activityType != DetectedActivity.STILL && item.getDuration(item.chart)> 150000) {
-                TripItemLayout(navController, viewModel, index)
-                // Only add the Box (connector/divider) if this is not the last item
-                if (index < items.size - 1) {
-                    // Connectors or dividers, adjust as needed
+                if (found)
                     Box(
                         modifier = Modifier
                             .padding(start = marginLateralDouble)
                             .size(width = marginLateralHalfHalf, height = 24.dp)
                             .background(Color.DarkGray)
                     )
-                }
+                TripItemLayout(navController, viewModel, index)
+                // Only add the Box (connector/divider) if this is not the last item
+                found = true
             }
         }
     }

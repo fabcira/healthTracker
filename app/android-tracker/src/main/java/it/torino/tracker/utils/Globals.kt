@@ -65,6 +65,8 @@ class Globals {
         const val USE_ACTIVITY_RECOGNITION: String = "use_activity_recognition"
         const val USE_HEART_RATE_MONITOR: String = "use_hr_monitor"
         const val USE_MOBILITY_MODELLING: String = "use_mobility_modelling"
+        const val USE_ACCELEROMETER: String = "use_accelerometer"
+
 
         // others
         const val POWER_PREFERENCES_GRANTED: String = "power_preferences_granted"

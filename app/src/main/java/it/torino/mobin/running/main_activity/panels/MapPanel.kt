@@ -95,8 +95,7 @@ fun MapViewComposable(myViewModel: MyViewModel, interfaceViewModel: InterfaceVie
         ) {
             DrawMap(locationsX, showMarkers)
             LaunchedEffect(Unit) {
-                // This is an example where you might wait for a certain condition or event
-                // You could also use other events or conditions to set this state
+                // action performed when teh composable is launched
                 interfaceViewModel.setShowMarkers(true)
             }
             if (myViewModel.currentTripIndex.value!! > 1)

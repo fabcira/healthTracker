@@ -9,6 +9,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import androidx.lifecycle.LifecycleCoroutineScope
 import it.torino.tracker.Repository
 import it.torino.tracker.tracker.TrackerService
 import it.torino.tracker.utils.Globals
@@ -20,7 +21,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class HeartRateMonitor(val context: Context, val repository: Repository?) : SensorEventListener {
+class HeartRateMonitor(
+    val context: Context,
+    lifecycleScope: LifecycleCoroutineScope,
+    val repository: Repository?
+) : SensorEventListener {
     private lateinit var repeatJob: Job
     private val _tag = this::class.java.simpleName
     private var sensorManager: SensorManager? = null

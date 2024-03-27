@@ -226,7 +226,7 @@ class ComputeDayDataAsync(
     private fun collectStepsFromDatabase(currentTracker: TrackerService?): MutableList<StepsData> {
         val steps = repositoryInstance?.dBStepsDao?.getStepsBetween(startTime, endTime)!!
         if (currentTracker?.stepCounter != null) {
-            val newStepsList = currentTracker.stepCounter?.stepsDataList
+            val newStepsList = currentTracker.stepCounter?.sensorValuesList
             steps.addAll(newStepsList!!)
             TrackerService.currentTracker?.stepCounter?.flush()
         }

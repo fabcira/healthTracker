@@ -12,25 +12,30 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.lifecycle.LifecycleCoroutineScope
+import it.torino.tracker.Repository
 import it.torino.tracker.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.logging.Logger
 
 class StepCounter internal constructor(
-    private var context: Context?
+    private var context: Context?,
+    lifecycleScope: LifecycleCoroutineScope,
+    repository: Repository?
 ) {
     private lateinit var taskTimeOutRunnable: Runnable
     private lateinit var taskHandler: Handler
     private var stepCounterListener: SensorEventListener? = null
     private var sensorManager: SensorManager? = null
     private var stepCounterSensor: Sensor? = null
-    var stepsDataList: MutableList<StepsData> = mutableListOf()
     var sensorValuesList: MutableList<StepsData> = mutableListOf()
     val _tag = this::class.java.simpleName
     private var lastUpdateTimestamp: Long = 0
+    // Maximum report latency in microseconds (e.g., 10 minutes)
+    // Adjust this value based on your batching requirements
+    private val maxReportLatencyUs: Int = 10 * 60 * 1000000
 
     companion object {
         var WAITING_TIME_IN_MSECS = 10000
@@ -81,6 +86,7 @@ class StepCounter internal constructor(
         Log.i(_tag, "Stopping step counter")
         flush()
         try {
+            sensorManager?.flush(stepCounterListener)
             sensorManager!!.unregisterListener(stepCounterListener)
         } catch (e: java.lang.Exception) {
             //  already unregistered
@@ -97,10 +103,11 @@ class StepCounter internal constructor(
      */
     private fun storeSteps(stepsData: StepsData) {
         Log.i(_tag, "Found ${stepsData.steps} steps at ${Utils.millisecondsToString(stepsData.timeInMsecs, "HH:mm:ss")}")
-        stepsDataList.add(stepsData)
-        if (context != null && stepsDataList.size > MAX_SIZE) {
-            InsertStepsDataAsync(context, stepsDataList)
-            stepsDataList = mutableListOf()
+        sensorValuesList.add(stepsData)
+        if (context != null && sensorValuesList.size > MAX_SIZE) {
+            val selectedSteps= selectBestSensorValue(sensorValuesList)
+            InsertStepsDataAsync(context, selectedSteps)
+            sensorValuesList = mutableListOf()
         }
     }
 
@@ -131,7 +138,7 @@ class StepCounter internal constructor(
         sensorManager!!.registerListener(
             stepCounterListener, stepCounterSensor,
             WAITING_TIME_IN_MSECS * 1000,
-            2 * WAITING_TIME_IN_MSECS * 1000
+            maxReportLatencyUs
         )
     }
 
@@ -144,17 +151,8 @@ class StepCounter internal constructor(
             override fun onSensorChanged(event: SensorEvent) {
                 if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
                     val currentTime = Utils.fromEventTimeToEpoch(event.timestamp)
-//                    Log.i("XXX", "steps: ${event.values[0].toInt()} diff: ${(currentTime - lastUpdateTimestamp)}")
-                    // Check if X seconds have passed since the last update
-                    // note: sensor readsing may come in order different from the
-                    // temporal one - sometimes they come in an unordered way
-                    // so this may need some checking
-                    if ((currentTime - lastUpdateTimestamp) >= WAITING_TIME_IN_MSECS) {
-                        val stpData= StepsData(currentTime, event.values[0].toInt())
-                        storeSteps(stpData)
-//                        Log.i("XXX", "inserted: $stpData")
-                        lastUpdateTimestamp = currentTime // Update the last processed time
-                    }
+                    val stpData= StepsData(currentTime, event.values[0].toInt())
+                    storeSteps(stpData)
                 }
             }
 
@@ -164,7 +162,7 @@ class StepCounter internal constructor(
     }
 
     fun flush() {
-        selectBestSensorValue(sensorValuesList)
+        val stepsDataList = selectBestSensorValue(sensorValuesList)
         sensorValuesList = mutableListOf()
         try {
             sensorManager!!.flush(stepCounterListener)
@@ -174,15 +172,14 @@ class StepCounter internal constructor(
         if (context != null && stepsDataList.size > 0) {
             CoroutineScope(Dispatchers.IO).launch {
                 Log.i(_tag, "saving to db!")
-                saveToDBCoroutine(context!!)
+                saveToDBCoroutine(context!!, stepsDataList)
             }
         }
     }
 
-    private suspend fun saveToDBCoroutine(context: Context) {
+    private suspend fun saveToDBCoroutine(context: Context, stepsDataList: MutableList<StepsData>) {
         delay(1000L)
         InsertStepsDataAsync(context, stepsDataList)
-        stepsDataList = mutableListOf()
         Log.i(_tag, "saved to db!")
     }
 
@@ -191,32 +188,29 @@ class StepCounter internal constructor(
      * and then every x collection, we select the best one
      * @param sensorValuesList
      */
-    private fun selectBestSensorValue(sensorValuesList: MutableList<StepsData>) {
-        if (sensorValuesList.size == 0) return
-        if (sensorValuesList.size == 1) {
-            storeSteps(sensorValuesList[0])
-            return
-        }
+    private fun selectBestSensorValue(sensorValuesList: MutableList<StepsData>) : MutableList<StepsData>{
+        if (sensorValuesList.size <= 1 ) return sensorValuesList
+        val finalList : MutableList<StepsData> = mutableListOf()
         sensorValuesList.sortBy { it.timeInMsecs }
-        var firstTime = sensorValuesList[0].timeInMsecs
-        val lastTime = sensorValuesList[sensorValuesList.size - 1].timeInMsecs
-        if (lastTime - firstTime < WAITING_TIME_IN_MSECS * 1.1)
-            storeSteps(sensorValuesList[sensorValuesList.size - 1])
-        else {
-            var found = false
-            for (index in 1 until sensorValuesList.size) {
-                val stepData = sensorValuesList[index]
-                val time = stepData.timeInMsecs
-                if (time - firstTime >= WAITING_TIME_IN_MSECS) {
-                    storeSteps(stepData)
-                    firstTime = time
-                    found = true
-                }
-            }
-            if (!found) {
-                storeSteps(sensorValuesList[sensorValuesList.size-1])
+
+        // Initialize variables for tracking last selected time and step
+        var lastSelectedTime = 0L
+        var lastSelectedIndex = -1
+
+        // Iterate through sensor readings and select readings at the specified interval
+        for ((index, stepsData) in sensorValuesList.withIndex()) {
+            // Check if enough time has elapsed since the last selected stepsData
+            if (stepsData.timeInMsecs - lastSelectedTime >= WAITING_TIME_IN_MSECS) {
+                // Select the sensor stepsData
+                finalList.add(stepsData)
+
+                // Update last selected time and index
+                lastSelectedTime = stepsData.timeInMsecs
+                lastSelectedIndex = index
             }
         }
+
+        return finalList
     }
 
     fun keepFlushingToDB(flush: Boolean) {
