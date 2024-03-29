@@ -40,11 +40,12 @@ import it.torino.mobin.utils.CustomButton
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
 
+
 @Composable
 fun PrivacyPolicy(navController: NavHostController, preferencesManager: PreferencesManager) {
     val context = LocalContext.current
     val myPreferenceKey = LocalContext.current.getString(R.string.my_preference_key)
-    val isPreferenceEnabled = preferencesManager.getBoolean(myPreferenceKey)
+    preferencesManager.getBoolean(myPreferenceKey)
     var acceptedTCs by remember { mutableStateOf(false) }
     ConstraintLayout(
         modifier = Modifier

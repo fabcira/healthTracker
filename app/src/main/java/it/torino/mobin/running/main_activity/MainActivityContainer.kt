@@ -57,11 +57,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import it.torino.mobin.MainActivity
 import it.torino.mobin.ui.theme.LargePadding
 import it.torino.mobin.R
 import it.torino.mobin.running.main_activity.panels.HealthPanel
@@ -76,12 +76,9 @@ import it.torino.mobin.utils.PreferencesManager
 
 @Composable
 fun MainContainer(
-    activity: MainActivity,
-    viewModel: MyViewModel,
     interfaceViewModel: InterfaceViewModel,
-    preferencesManager: PreferencesManager
+    viewModel: MyViewModel
 ) {
-    val context = LocalContext.current
     val navController: NavHostController = rememberNavController()
 
     val navigationBarHeight = 88.dp

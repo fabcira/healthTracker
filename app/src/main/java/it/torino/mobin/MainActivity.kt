@@ -89,7 +89,7 @@ class MainActivity : ComponentActivity() {
                         }
                         navigation(startDestination = secondDestination, route = "running") {
                             composable("Home") {
-                                MainContainer(activity, viewModel, interfaceViewModel, preferencesManager)
+                                MainContainer(interfaceViewModel, viewModel)
                             }
                         }
                     }
