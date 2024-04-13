@@ -34,14 +34,12 @@ import it.torino.mobin.ui.theme.MediumPadding
 import it.torino.mobin.ui.theme.SpacerHeight
 import it.torino.mobin.utils.CustomButton
 import it.torino.mobin.utils.LocalPreferencesManager
-import it.torino.mobin.utils.PreferencesManager
 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationPermissionsComposable(
-    navController: NavHostController,
-    preferencesManager: PreferencesManager
+    navController: NavHostController
 ) {
     val preferencesManager = LocalPreferencesManager.current
     val context = LocalContext.current
