@@ -33,6 +33,7 @@ class StepCounter internal constructor(
     var sensorValuesList: MutableList<StepsData> = mutableListOf()
     val _tag = this::class.java.simpleName
     private var lastUpdateTimestamp: Long = 0
+
     // Maximum report latency in microseconds (e.g., 10 minutes)
     // Adjust this value based on your batching requirements
     private val maxReportLatencyUs: Int = 10 * 60 * 1000000
@@ -51,14 +52,19 @@ class StepCounter internal constructor(
 
     init {
         sensorManager = context!!.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        if (sensorManager != null) {
+        sensorManager?.let {
             stepCounterSensor = sensorManager!!.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-            if (stepCounterSensor != null) {
+            stepCounterSensor?.let {
+                Log.d("SensorInfo", "Maximum Range: ${it.maximumRange}")
+                Log.d("SensorInfo", "Min Delay: ${it.minDelay}")
+                Log.d("SensorInfo", "Power: ${it.power}")
+                Log.d("SensorInfo", "Resolution: ${it.resolution}")
                 Log.d(_tag, "Step Counter found on phone")
                 stepCounterListener = getSensorListener()
-            } else {
-                Log.d(_tag, "Step Counter ot present on phone")
             }
+            // else branch of let
+        } ?: run {
+            Log.d(_tag, "Step Counter ot present on phone")
         }
     }
     ////////////////////////////////////////////////////////////////////////
@@ -101,13 +107,23 @@ class StepCounter internal constructor(
      * it stores the steps into the temp list (or in case of overflow into the DB)
      * and it sets the variable lastStepsDetected
      */
-    private fun storeSteps(stepsData: StepsData) {
-        Log.i(_tag, "Found ${stepsData.steps} steps at ${Utils.millisecondsToString(stepsData.timeInMsecs, "HH:mm:ss")}")
-        sensorValuesList.add(stepsData)
-        if (context != null && sensorValuesList.size > MAX_SIZE) {
-            val selectedSteps= selectBestSensorValue(sensorValuesList)
-            InsertStepsDataAsync(context, selectedSteps)
-            sensorValuesList = mutableListOf()
+    private fun storeSteps(stepEvent: StepsData?) {
+        stepEvent?.let {
+            Log.i(
+                _tag,
+                "Found ${stepEvent.steps} steps at ${
+                    Utils.millisecondsToString(
+                        stepEvent.timeInMsecs,
+                        "HH:mm:ss"
+                    )
+                }"
+            )
+            sensorValuesList.add(stepEvent)
+            if (context != null && sensorValuesList.size > MAX_SIZE) {
+                val selectedSteps = selectBestSensorValue(sensorValuesList)
+                InsertStepsDataAsync(context, selectedSteps)
+                sensorValuesList = mutableListOf()
+            }
         }
     }
 
@@ -135,7 +151,7 @@ class StepCounter internal constructor(
     private fun registerListener() {
         // the parameters are required in microseconds and we have them in milliseconds
         // so both are * 1000
-        sensorManager!!.registerListener(
+        sensorManager?.registerListener(
             stepCounterListener, stepCounterSensor,
             WAITING_TIME_IN_MSECS * 1000,
             maxReportLatencyUs
@@ -148,8 +164,8 @@ class StepCounter internal constructor(
      */
     private fun getSensorListener(): SensorEventListener {
         return object : SensorEventListener {
-            override fun onSensorChanged(event: SensorEvent) {
-                if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
+            override fun onSensorChanged(event: SensorEvent?) {
+                if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
                     val currentTime = Utils.fromEventTimeToEpoch(event.timestamp)
                     val stpData= StepsData(currentTime, event.values[0].toInt())
                     storeSteps(stpData)
