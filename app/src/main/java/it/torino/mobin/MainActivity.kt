@@ -37,6 +37,7 @@ import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.mobin.utils.InterfaceViewModelFactory
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
+import it.torino.tracker.utils.Globals.Companion.MSECS_IN_A_DAY
 import it.torino.tracker.view_model.MyViewModel
 import it.torino.tracker.view_model.MyViewModelFactory
 
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     val myViewModelFactory = MyViewModelFactory(LocalContext.current)
                     val viewModel: MyViewModel by viewModels { myViewModelFactory }
 
-//                    viewModel.setCurrentDateTime(System.currentTimeMillis()-MSECS_IN_A_DAY)
+                    viewModel.setCurrentDateTime(System.currentTimeMillis())
                     val navController = rememberNavController()
                     var startDestination = "onboarding"
                     val secondDestination = getNextNavigationRouteDuringOnboarding(LocalContext.current, preferencesManager)
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
                                 TermsAndConditions(navController, preferencesManager)
                             }
                             composable("Location Permissions") {
-                                LocationPermissionsComposable(navController, preferencesManager)
+                                LocationPermissionsComposable(navController)
                             }
                             composable("Activity Permissions") {
                                 ActivityRecognitionPermissions(activity, navController, viewModel, preferencesManager)
