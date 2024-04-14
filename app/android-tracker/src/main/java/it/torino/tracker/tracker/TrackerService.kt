@@ -148,7 +148,7 @@ class TrackerService : LifecycleService() {
         Log.i(TAG, "Starting trackers...")
         try {
             Log.i(TAG, "starting step counting ${stepCounter != null}")
-            stepCounter?.startStepCounting()
+            stepCounter?.startStepCounting(this)
         } catch (e: Exception) {
             Log.e(TAG, "error starting the step counter: " + e.message)
         }

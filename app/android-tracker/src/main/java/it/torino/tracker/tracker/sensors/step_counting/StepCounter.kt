@@ -3,7 +3,9 @@
  */
 package it.torino.tracker.tracker.sensors.step_counting
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -12,6 +14,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import it.torino.tracker.Repository
 import it.torino.tracker.utils.Utils
@@ -35,7 +38,7 @@ class StepCounter internal constructor(
     private var lastUpdateTimestamp: Long = 0
     // Maximum report latency in microseconds (e.g., 10 minutes)
     // Adjust this value based on your batching requirements
-    private val maxReportLatencyUs: Int = 10 * 60 * 1000000
+    private val maxReportLatencyUs: Int = 60 * 1000000
 
     companion object {
         var WAITING_TIME_IN_MSECS = 10000
@@ -68,12 +71,12 @@ class StepCounter internal constructor(
     /**
      * API call for the Tracker Sensor to start the step counter
      */
-    fun startStepCounting() {
+    fun startStepCounting(context: Context) {
         Log.i(_tag, "launching...")
         // if the sensor is null,then mSensorManager is null and we get a crash
         if (isStepCounterAvailable()) {
             Log.d("Standard StepCounter", "starting listener")
-            registerListener()
+            registerListener(context)
             huaweiHandler()
         }
     }
@@ -124,7 +127,7 @@ class StepCounter internal constructor(
                 taskHandler = Handler(it!!)
                 taskTimeOutRunnable = Runnable {
                     stopStepCounting()
-                    registerListener()
+                    registerListener(context!!)
                     taskHandler.postDelayed(taskTimeOutRunnable, WAITING_TIME_IN_MSECS.toLong())
                 }
                 taskHandler.postDelayed(taskTimeOutRunnable, 1000)
@@ -132,14 +135,21 @@ class StepCounter internal constructor(
         }
     }
 
-    private fun registerListener() {
-        // the parameters are required in microseconds and we have them in milliseconds
-        // so both are * 1000
-        sensorManager!!.registerListener(
-            stepCounterListener, stepCounterSensor,
-            WAITING_TIME_IN_MSECS * 1000,
-            maxReportLatencyUs
-        )
+    private fun registerListener(context: Context) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            // the parameters are required in microseconds and we have them in milliseconds
+            // so both are * 1000
+            sensorManager!!.registerListener(
+                stepCounterListener, stepCounterSensor,
+                WAITING_TIME_IN_MSECS * 1000,
+//            maxReportLatencyUs
+                0
+            )
+        } else Log.e(_tag, "STEP COUNTER CANNOT RUN: No permissions allowed")
     }
 
     /**

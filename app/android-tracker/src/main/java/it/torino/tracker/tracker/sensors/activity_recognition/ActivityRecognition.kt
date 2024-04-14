@@ -192,9 +192,9 @@ class ActivityRecognition(
             // for ActivityCompat#requestPermissions for more details.
             return
         } else {
-            Log.i(_tag, "no permissions allowed")
+            Log.i(_tag, "Permissions allowed")
         }
-            ActivityRecognition.getClient(context)
+        ActivityRecognition.getClient(context)
             .requestActivityTransitionUpdates(request, arPendingIntent)
 //        task.addOnSuccessListener { Log.i(TAG, "Transitions  successfully registered.") }
 //        task.addOnFailureListener { e: Error -> Log.e(TAG, "Error in Transition Registration: $e") }
