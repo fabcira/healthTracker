@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -73,6 +74,8 @@ import it.torino.tracker.view_model.MyViewModel
 import java.util.Calendar
 import it.torino.mobin.utils.PreferencesManager
 import it.torino.tracker.utils.Utils
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -127,8 +130,15 @@ fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, navController: Nav
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                myViewModel.onResume(context)
+                myViewModel.setCurrentDateTime(System.currentTimeMillis())
                 myViewModel.computeResults()
+                // do this after computing the results or you will not flush the sensors
+                myViewModel.viewModelScope.launch {
+                    // give it the time to flush and compute the results
+                    delay(2000)
+                    myViewModel.startTracker(context)
+                }
+
                 // Navigate to "Home" only if not already there to avoid loop or unnecessary navigation
                 if (navController.currentDestination?.route != startDestination) {
                     navController.navigate(startDestination) {

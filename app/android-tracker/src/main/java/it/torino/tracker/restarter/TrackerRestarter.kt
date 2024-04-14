@@ -24,6 +24,8 @@ class TrackerRestarter {
         private val _dataUploadInterval = _emergencyDataUploadInterval
     }
     fun startTrackerAndDataUpload(context: Context) {
+        Log.i(TAG, "stopping the managers")
+        WorkManager.getInstance(context).cancelAllWork()
         startTrackerProper(context)
         startDataUploader(context, true)
     }

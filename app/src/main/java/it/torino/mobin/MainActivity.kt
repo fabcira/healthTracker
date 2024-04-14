@@ -56,7 +56,6 @@ class MainActivity : ComponentActivity() {
                     val myViewModelFactory = MyViewModelFactory(LocalContext.current)
                     val viewModel: MyViewModel by viewModels { myViewModelFactory }
 
-                    viewModel.setCurrentDateTime(System.currentTimeMillis())
                     val navController = rememberNavController()
                     var startDestination = "onboarding"
                     val secondDestination = getNextNavigationRouteDuringOnboarding(LocalContext.current, preferencesManager)

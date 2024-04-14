@@ -84,7 +84,7 @@ class TrackerService : LifecycleService() {
             activityRecognition = ActivityRecognition(this, lifecycleScope, repository)
         // for the step counter we need to set up the attributiontag context as a context
         if (stepCounter == null && useStepCounter == true)
-            stepCounter = StepCounter(attributionContext, lifecycleScope, repository)
+            stepCounter = StepCounter(attributionContext)
         if (heartMonitor == null && useHRmonitoring == true)
         // for the hr monitor we need to set up the attributiontag context as a context
             heartMonitor = HeartRateMonitor(attributionContext, lifecycleScope, repository)

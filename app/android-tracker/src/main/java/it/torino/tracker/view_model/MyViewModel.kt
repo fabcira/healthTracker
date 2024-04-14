@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import it.torino.tracker.Repository
 import it.torino.tracker.TrackerManager
+import it.torino.tracker.restarter.RestartTrackerBroadcastReceiver
 import it.torino.tracker.restarter.TrackerRestarter
 import it.torino.tracker.retrieval.ComputeDayDataAsync
 import it.torino.tracker.retrieval.MobilityResultComputation
@@ -119,31 +120,9 @@ class MyViewModel(val application: Context) : ViewModel() {
     }
 
     fun startTracker(context: Context) {
-//        // Constructing the Intent for the broadcast
-//        val intent = Intent("it.torino.core_engine.restarter.RestartTracker").apply {
-//            // Specify the component to receive this intent
-//            component = android.content.ComponentName(
-//                "it.torino.tracker", // Package name of the receiving app
-//                "it.torino.tracker.restarter.RestartTrackerBroadcastReceiver" // Fully-qualified class name of the receiver
-//            )
-//        }
-//        // Sending the broadcast
-//        context.sendBroadcast(intent)
-        val permissionGranted = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
-        if (permissionGranted) {
-            val trackerRestarter = TrackerRestarter()
-            Log.i(TAG, "starting tracker...")
-            trackerRestarter.startTrackerAndDataUpload(context)
-        } else {
-            Log.i(TAG, "No permissions set yet - not starting tracker...")
-        }
+        RestartTrackerBroadcastReceiver.startTrackersAndUploaders(context)
     }
 
-    fun onResume(context: Context) {
-        startTracker(context)
-    }
 
     fun onPause() {
         TrackerManager.getInstance(application).onPause(this)
