@@ -8,10 +8,10 @@ package it.torino.tracker.data_upload.data_senders
 import android.content.Context
 import android.util.Log
 import it.torino.tracker.data_upload.HttpsServer
-import it.torino.tracker.data_upload.dts_data.StepsDataDTS
 import it.torino.tracker.tracker.sensors.step_counting.StepsData
 import it.torino.tracker.utils.Globals
 import org.json.JSONObject
+import uk.ac.shef.tracker.core.serialization.StepsRequest
 
 class StepsDataSender(val context: Context) {
     private val TAG: String = javaClass.simpleName
@@ -47,10 +47,10 @@ class StepsDataSender(val context: Context) {
         stepsToSend = collectStepsFromDatabase()
         if (stepsToSend != null && stepsToSend!!.isNotEmpty()) {
             Log.i(TAG, "Sending ${stepsToSend!!.size} steps")
-            val stepsDTSList: MutableList<StepsDataDTS> = mutableListOf()
+            val stepsDTSList: MutableList<StepsRequest.StepRequest> = mutableListOf()
             for (step in stepsToSend!!)
                 if (step != null)
-                    stepsDTSList.add(StepsDataDTS(step))
+                    stepsDTSList.add(StepsRequest.StepRequest(step))
             val dataSenderUtils = DataSenderUtils()
             dataObject.put(Globals.STEPS_ON_SERVER, dataSenderUtils.getJSONArrayOfObjects(stepsDTSList))
             return dataObject

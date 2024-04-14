@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
-import it.torino.mobin.MainActivity
+import androidx.navigation.compose.rememberNavController
 import it.torino.mobin.R
 import it.torino.mobin.getNextNavigationRouteDuringOnboarding
 import it.torino.mobin.onboarding.openAppSettings
@@ -28,16 +28,16 @@ import it.torino.mobin.utils.CustomButton
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
 
+
 @Composable
-fun BatteryOptimisation(navController: NavHostController, preferencesManager: PreferencesManager) {
+fun BatteryPermissionsRemoval(navController: NavHostController, preferencesManager: PreferencesManager) {
     val context = LocalContext.current
-    val myPreferenceKey = LocalContext.current.getString(R.string.battery_optimised)
+    val myPreferenceKey = LocalContext.current.getString(R.string.permission_removal_unticked_key)
+    var settingsOpened by remember {mutableStateOf(false)}
 
     ConstraintLayout(modifier = Modifier.fillMaxHeight().padding(MediumPadding)) {
         val (text1, text2, button1, button2) = createRefs()
-
-        var settingsOpened by remember {mutableStateOf(false)}
-        Text(context.getString(R.string.battery_permissions),
+        Text(context.getString(R.string.battery_permissions_removal),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(SpacerHeight)
@@ -49,7 +49,7 @@ fun BatteryOptimisation(navController: NavHostController, preferencesManager: Pr
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
         )
-        Text(context.getString(R.string.battery_settings_description),
+        Text(context.getString(R.string.battery_permissions_removal_description),
             modifier = Modifier
                 .fillMaxWidth()
                 .constrainAs(text2) {
@@ -65,13 +65,14 @@ fun BatteryOptimisation(navController: NavHostController, preferencesManager: Pr
                 bottom.linkTo(button2.top)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-            }, context.getString(R.string.open_battery_permissions) ,
+            },
+            context.getString(R.string.open_battery_permissions) ,
             contentColour = if (!settingsOpened) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
             containerColour = if (!settingsOpened) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
             consecutiveButtons = true
         ) {
-             openAppSettings(context)
             preferencesManager.setBoolean(myPreferenceKey, true)
+            openAppSettings(context)
             settingsOpened = true
         }
         CustomButton(modifier=Modifier
@@ -79,8 +80,7 @@ fun BatteryOptimisation(navController: NavHostController, preferencesManager: Pr
                 bottom.linkTo(parent.bottom)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-            },
-            context.getString(R.string.next),
+            }, context.getString(R.string.next),
             contentColour = if (settingsOpened) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
             containerColour = if (settingsOpened) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
             consecutiveButtons = true
@@ -88,26 +88,26 @@ fun BatteryOptimisation(navController: NavHostController, preferencesManager: Pr
         ) {
             val nextDestination = getNextNavigationRouteDuringOnboarding(context, preferencesManager)
             navController.navigate(nextDestination) {
-                    navController.popBackStack()
-                }
+                navController.popBackStack()
+            }
         }
 
     }
 }
 
-
-fun batteryOptimisationRemoved(context: Context, preferencesManager: PreferencesManager): Boolean {
-    val myPreferenceKey = context.getString(R.string.battery_optimised)
+fun batteryPermissionsRemovalUnlinked(context: Context, preferencesManager: PreferencesManager): Boolean {
+    val myPreferenceKey = context.getString(R.string.permission_removal_unticked_key)
 // Check and react to the permission state
     return preferencesManager.getBoolean(myPreferenceKey)
 }
+
 @Preview
 @Composable
 private fun Preview() {
     MobinTheme {
-        val activity = MainActivity()
+        val navController: NavHostController = rememberNavController()
         val preferencesManager = LocalPreferencesManager.current
 
-        BatteryOptimisation(NavHostController(activity), preferencesManager)
+        BatteryOptimisation(navController, preferencesManager)
     }
 }

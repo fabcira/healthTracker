@@ -67,6 +67,8 @@ class Globals {
         const val USE_MOBILITY_MODELLING: String = "use_mobility_modelling"
         const val USE_ACCELEROMETER: String = "use_accelerometer"
 
+        const val EMPTY = ""
+        const val INVALID = -1
 
         // others
         const val POWER_PREFERENCES_GRANTED: String = "power_preferences_granted"

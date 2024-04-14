@@ -30,13 +30,13 @@ fun CustomButton(
     containerColour: Color,
     contentColour: Color,
     consecutiveButtons: Boolean = false,
-    onButtonClick: () -> Unit
+    onButtonClick:  () -> Unit
 ) {
     Button(
         modifier = modifier.fillMaxWidth()
             .padding(if (consecutiveButtons) SmallPadding else MediumPadding)
             .height(buttonHeight),
-        onClick = { onButtonClick() },
+        onClick = onButtonClick ,
         shape = RoundedCornerShape(8.dp), // Adjust the corner size as needed
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColour, // Background color

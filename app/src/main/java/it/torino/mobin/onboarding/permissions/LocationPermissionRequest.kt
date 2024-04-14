@@ -28,7 +28,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import it.torino.mobin.R
-import it.torino.mobin.onboarding.permissions.setPrivacyPolicyShown
+import it.torino.mobin.getNextNavigationRouteDuringOnboarding
 import it.torino.mobin.ui.theme.LargePadding
 import it.torino.mobin.ui.theme.MediumPadding
 import it.torino.mobin.ui.theme.SpacerHeight
@@ -157,8 +157,8 @@ fun LocationPermissionsComposable(
             consecutiveButtons = false,
         ) {
             if (backgroundPermissionRequested && foregroundPermissionRequested) {
-                navController.navigate("Activity Permissions") {
-                    setPrivacyPolicyShown(context, preferencesManager)
+                val nextDestination = getNextNavigationRouteDuringOnboarding(context, preferencesManager)
+                navController.navigate(nextDestination) {
                     navController.popBackStack()
                 }
             }

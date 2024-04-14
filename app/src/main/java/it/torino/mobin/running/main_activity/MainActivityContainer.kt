@@ -2,7 +2,6 @@ package it.torino.mobin.running.main_activity
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -58,11 +57,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import it.torino.mobin.MainActivity
 import it.torino.mobin.ui.theme.LargePadding
 import it.torino.mobin.R
 import it.torino.mobin.running.main_activity.panels.HealthPanel
@@ -72,17 +72,17 @@ import it.torino.mobin.running.main_activity.panels.TripsScreen
 import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.tracker.view_model.MyViewModel
 import java.util.Calendar
-import androidx.activity.viewModels
-import it.torino.mobin.utils.InterfaceViewModelFactory
+import it.torino.mobin.utils.PreferencesManager
+import it.torino.tracker.utils.Utils
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun MainContainer(
-    activity: MainActivity,
-    viewModel: MyViewModel,
-    interfaceViewModel: InterfaceViewModel
+    interfaceViewModel: InterfaceViewModel,
+    viewModel: MyViewModel
 ) {
-    val context = LocalContext.current
     val navController: NavHostController = rememberNavController()
 
     val navigationBarHeight = 88.dp
@@ -130,8 +130,15 @@ fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, navController: Nav
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                myViewModel.onResume(context)
+                myViewModel.setCurrentDateTime(System.currentTimeMillis())
                 myViewModel.computeResults()
+                // do this after computing the results or you will not flush the sensors
+                myViewModel.viewModelScope.launch {
+                    // give it the time to flush and compute the results
+                    delay(2000)
+                    myViewModel.startTracker(context)
+                }
+
                 // Navigate to "Home" only if not already there to avoid loop or unnecessary navigation
                 if (navController.currentDestination?.route != startDestination) {
                     navController.navigate(startDestination) {

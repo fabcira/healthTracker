@@ -16,20 +16,6 @@ import com.google.firebase.FirebaseApp
 import it.torino.tracker.utils.Globals
 
 class RestartTrackerBroadcastReceiver : BroadcastReceiver() {
-    val TAG: String = this::class.java.simpleName
-    companion object {
-        const val broadcastIntent: String= "it.torino.core_engine.restarter.RestartTracker"
-
-        fun getCodeVersion(): Long {
-            try {
-                return System.currentTimeMillis()
-            } catch (e: Exception) {
-                Log.e("RestartTrackerBroadcastReceiver", e.message!!)
-            }
-            return 0
-        }
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         FirebaseApp.initializeApp(context)
         Log.i(TAG, "Re-starter broadcast received!")
@@ -44,15 +30,33 @@ class RestartTrackerBroadcastReceiver : BroadcastReceiver() {
                 editor.apply()
             }
         }
-        val permissionGranted = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        startTrackersAndUploaders(context)
+    }
 
-        if (permissionGranted) {
-            val trackerRestarter = TrackerRestarter()
-            Log.i(TAG, "starting tracker...")
-            trackerRestarter.startTrackerAndDataUpload(context)
-        } else {
-            Log.i(TAG, "No permissions set yet - not starting tracker...")
+    companion object {
+        val TAG: String = this::class.java.simpleName
+        const val broadcastIntent: String= "it.torino.core_engine.restarter.RestartTracker"
+
+        fun getCodeVersion(): Long {
+            try {
+                return System.currentTimeMillis()
+            } catch (e: Exception) {
+                Log.e("RestartTrackerBroadcastReceiver", e.message!!)
+            }
+            return 0
+        }
+
+        fun startTrackersAndUploaders(context: Context) {
+            val permissionGranted = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+            if (permissionGranted) {
+                val trackerRestarter = TrackerRestarter()
+                Log.i(TAG, "starting tracker...")
+                trackerRestarter.startTrackerAndDataUpload(context)
+            } else {
+                Log.i(TAG, "No permissions set yet - not starting tracker...")
+            }
         }
     }
 
