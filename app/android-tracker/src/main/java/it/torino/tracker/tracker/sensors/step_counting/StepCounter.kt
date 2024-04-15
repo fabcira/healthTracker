@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import it.torino.tracker.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -153,12 +154,12 @@ class StepCounter internal constructor(
         ) {
             // the parameters are required in microseconds and we have them in milliseconds
             // so both are * 1000
-            sensorManager!!.registerListener(
+            val registered = sensorManager!!.registerListener(
                 stepCounterListener, stepCounterSensor,
                 WAITING_TIME_IN_MSECS * 1000,
-//            maxReportLatencyUs
                 0
             )
+            Log.i(_tag, "Step counter registered? $registered")
         } else Log.e(_tag, "STEP COUNTER CANNOT RUN: No permissions allowed")
     }
 
@@ -169,17 +170,8 @@ class StepCounter internal constructor(
     private fun getSensorListener(): SensorEventListener {
         return object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
-                Log.i(_tag, "Sensor changed! $event")
+//                Log.i(_tag, "Sensor changed! $event")
                 if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-                    Log.i(
-                        _tag,
-                        "Found ${event.values[0]} steps at ${
-                            Utils.millisecondsToString(
-                                event.timestamp,
-                                "HH:mm:ss"
-                            )
-                        }"
-                    )
                     val currentTime = Utils.fromEventTimeToEpoch(event.timestamp)
                     val stpData= StepsData(currentTime, event.values[0].toInt())
                     storeSteps(stpData)

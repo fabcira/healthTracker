@@ -118,7 +118,7 @@ class ActivityRecognition(
                     "Transitions Updates could not be unregistered: $e"
                 )
             }
-            .addOnSuccessListener { Log.i(_tag, "Transitions Updates successfully unregistered.") }
+            .addOnSuccessListener { Log.i(_tag, "Transitions Updates successfully registered.") }
         if (activityTransitionsReceiver != null) {
             context.unregisterReceiver(activityTransitionsReceiver)
             activityTransitionsReceiver = null
