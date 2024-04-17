@@ -95,7 +95,7 @@ fun BatteryPermissionsRemoval(navController: NavHostController, preferencesManag
     }
 }
 
-fun batteryPermissionsRemovalUnlinked(context: Context, preferencesManager: PreferencesManager): Boolean {
+fun batteryPermissionsRemovalRemoved(context: Context, preferencesManager: PreferencesManager): Boolean {
     val myPreferenceKey = context.getString(R.string.permission_removal_unticked_key)
 // Check and react to the permission state
     return preferencesManager.getBoolean(myPreferenceKey)

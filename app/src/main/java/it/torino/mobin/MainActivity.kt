@@ -28,7 +28,7 @@ import it.torino.mobin.onboarding.permissions.PrivacyPolicy
 import it.torino.mobin.onboarding.permissions.activityRecognitionPermissionGranted
 import it.torino.mobin.onboarding.permissions.arePermissionsToBeRequested
 import it.torino.mobin.onboarding.permissions.batteryOptimisationRemoved
-import it.torino.mobin.onboarding.permissions.batteryPermissionsRemovalUnlinked
+import it.torino.mobin.onboarding.permissions.batteryPermissionsRemovalRemoved
 import it.torino.mobin.onboarding.permissions.privacyPolicyShown
 import it.torino.mobin.onboarding.permissions.termsAndConditionsAccepted
 import it.torino.mobin.ui.theme.MobinTheme
@@ -37,7 +37,6 @@ import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.mobin.utils.InterfaceViewModelFactory
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
-import it.torino.tracker.utils.Globals.Companion.MSECS_IN_A_DAY
 import it.torino.tracker.view_model.MyViewModel
 import it.torino.tracker.view_model.MyViewModelFactory
 
@@ -116,7 +115,7 @@ fun getNextNavigationRouteDuringOnboarding(context: Context, preferencesManager:
         secondDestination = "Activity Permissions"
     } else if(!batteryOptimisationRemoved(context, preferencesManager)){
         secondDestination = "Battery_optimisation"
-    } else if(!batteryPermissionsRemovalUnlinked(context, preferencesManager)){
+    } else if(!batteryPermissionsRemovalRemoved(context, preferencesManager)){
         secondDestination = "Battery_permissions_removal"
     }
     return secondDestination
