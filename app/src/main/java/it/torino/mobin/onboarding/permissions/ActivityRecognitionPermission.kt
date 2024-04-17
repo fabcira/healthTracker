@@ -4,6 +4,7 @@ import CheckboxWithRationale
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,19 +32,19 @@ import it.torino.mobin.ui.theme.SpacerHeight
 import it.torino.mobin.utils.PreferencesManager
 import it.torino.tracker.view_model.MyViewModel
 
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ActivityRecognitionPermissions(activity: MainActivity, navController: NavHostController, viewModel: MyViewModel,
                                    preferencesManager: PreferencesManager) {
     val context = LocalContext.current
 
-    val activityRecognitionPermissionState = rememberPermissionState(
-        android.Manifest.permission.ACTIVITY_RECOGNITION
-    )
-    val showForegroundRationale =
-            (activityRecognitionPermissionState.status is PermissionStatus.Denied &&
-                    (activityRecognitionPermissionState.status as PermissionStatus.Denied).shouldShowRationale)
-
+    val activityRecognitionPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        rememberPermissionState(android.Manifest.permission.ACTIVITY_RECOGNITION)
+    } else {
+        // Pre-Q does not require this permission, treat as always granted
+        null
+    }
 
     Column(modifier = Modifier.fillMaxSize()
         .padding(MediumPadding)) {
@@ -83,20 +84,6 @@ fun ActivityRecognitionPermissions(activity: MainActivity, navController: NavHos
 @Composable
 private fun getTexts(): List<Unit> {
     return listOf(
-//        Text(
-//            LocalContext.current.getString(R.string.onboarding_location_0),
-//            modifier = Modifier.fillMaxWidth()
-//                .padding(MediumPadding),
-//            color = MaterialTheme.colorScheme.onBackground,
-//            style = MaterialTheme.typography.bodyMedium,
-//        ),
-//        Text(
-//            LocalContext.current.getString(R.string.onboarding_location_1),
-//            modifier = Modifier.fillMaxWidth()
-//                .padding(MediumPadding),
-//            color = MaterialTheme.colorScheme.onBackground,
-//            style = MaterialTheme.typography.bodyMedium,
-//        ),
         Text(
             LocalContext.current.getString(R.string.A_R_description),
             modifier = Modifier.fillMaxWidth()
