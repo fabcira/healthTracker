@@ -346,7 +346,7 @@ fun CheckboxWithRationaleX(
     label: String,
     permissionState: PermissionState
 ) {
-    var userCheckedState by remember { mutableStateOf(permissionState.status is PermissionStatus.Granted) }
+    val userCheckedState by remember { mutableStateOf(permissionState.status is PermissionStatus.Granted) }
 
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
