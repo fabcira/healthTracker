@@ -10,9 +10,9 @@ import android.content.pm.PackageInfo
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import it.torino.tracker.view_model.MyViewModel
 import it.torino.tracker.utils.Globals
 import it.torino.tracker.utils.PreferencesStore
+import it.torino.tracker.view_model.MyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -92,9 +92,17 @@ class UserRegistration(val context: Context, val viewModel: MyViewModel) {
         val androidVersion = getAndroidVersion()
         val phoneModel = getPhoneModel()
         val userObject = JSONObject()
+        userObject.put(Globals.USER_ID, "000000")
         userObject.put(Globals.PHONE_MODEL, phoneModel)
         userObject.put(Globals.ANDROID_VERSION, androidVersion)
         userObject.put(Globals.APP_VERSION, appVersion)
+        userObject.put(Globals.AGE, 18)
+        userObject.put(Globals.HEIGHT, 170)
+        userObject.put(Globals.WEIGHT, 60)
+        userObject.put(Globals.PARTICIPANT_ID, "0000000")
+        userObject.put(Globals.TIME_IN_MILLIS, System.currentTimeMillis())
+        userObject.put(Globals.CREATED_AT, System.currentTimeMillis())
+
         return userObject
     }
 

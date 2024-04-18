@@ -56,7 +56,7 @@ class TrackerRestarter {
         workManager.enqueueUniquePeriodicWork(
             dataUploadingWorkName,
             // if it is pending, do not enqueue
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             work
         )
 
