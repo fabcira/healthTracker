@@ -18,10 +18,12 @@ class HttpsServer {
     fun sendToServer(urlx: String, data: JSONObject): JSONObject? {
         var responseObject: JSONObject? = null
         val url = URL(urlx)
-        val urlConnection: HttpURLConnection = url.openConnection() as HttpsURLConnection
-//        val urlConnection: HttpURLConnection = url.openConnection() as HttpURLConnection
-        Log.i(TAG, "Sending data to $urlx")
+        var urlConnection: HttpURLConnection? = null
         try {
+            // @todo reinstate HttpsURLConnection rather than HttpURLConnection
+            urlConnection = url.openConnection() as HttpURLConnection
+    //        val urlConnection: HttpURLConnection = url.openConnection() as HttpURLConnection
+            Log.i(TAG, "Sending data to $urlx")
             urlConnection.doOutput = true
             urlConnection.setChunkedStreamingMode(0)
             urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -50,7 +52,7 @@ class HttpsServer {
             Log.e(TAG, e.message!!)
             Log.d(TAG, "error in sending: {${e.printStackTrace()}}")
         } finally {
-            urlConnection.disconnect()
+            urlConnection?.disconnect()
         }
         return responseObject
     }
