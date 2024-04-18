@@ -6,9 +6,7 @@
 package it.torino.tracker
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
-import androidx.activity.ComponentActivity
 import it.torino.tracker.data_upload.UserRegistration
 import it.torino.tracker.restarter.RestartTrackerBroadcastReceiver
 import it.torino.tracker.restarter.TrackerRestarter
@@ -51,14 +49,13 @@ class TrackerManager private constructor(private val activity: Context) {
 
     }
 
-    fun onResume(viewModel: MyViewModel) {
+    fun onResume(viewModel: MyViewModel, context: Context) {
         // it is necessary to restart the tracker in case it has stopped (also useful when the app
         // is installed and finally the main app is opened)
-        val i =  Intent()
-        i.action = RestartTrackerBroadcastReceiver.broadcastIntent
-        activity.sendBroadcast(i)
-        Log.i(TAG, "flushing to db ")
-        viewModel.keepFlushingToDB(false)
+//        val i =  Intent()
+//        i.action = RestartTrackerBroadcastReceiver.broadcastIntent
+//        activity.sendBroadcast(i)
+        RestartTrackerBroadcastReceiver.startTrackersAndUploaders(context)
         checkUserRegistration(viewModel)
     }
 
