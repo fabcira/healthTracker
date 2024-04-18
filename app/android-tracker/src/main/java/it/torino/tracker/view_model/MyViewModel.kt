@@ -4,18 +4,12 @@
  */
 package it.torino.tracker.view_model
 
-import android.Manifest
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import it.torino.tracker.Repository
 import it.torino.tracker.TrackerManager
-import it.torino.tracker.restarter.RestartTrackerBroadcastReceiver
-import it.torino.tracker.restarter.TrackerRestarter
 import it.torino.tracker.retrieval.ComputeDayDataAsync
 import it.torino.tracker.retrieval.MobilityResultComputation
 import it.torino.tracker.retrieval.data.TripData
@@ -24,7 +18,6 @@ import it.torino.tracker.tracker.sensors.activity_recognition.ActivityData
 import it.torino.tracker.tracker.sensors.heart_rate_monitor.HeartRateData
 import it.torino.tracker.tracker.sensors.location_recognition.LocationData
 import it.torino.tracker.tracker.sensors.step_counting.StepsData
-import it.torino.tracker.utils.Globals
 import it.torino.tracker.utils.Globals.Companion.MSECS_IN_A_DAY
 import it.torino.tracker.utils.Utils
 import it.torino.tracker.utils.Utils.Companion.isToday
@@ -120,7 +113,8 @@ class MyViewModel(val application: Context) : ViewModel() {
     }
 
     fun startTracker(context: Context) {
-        RestartTrackerBroadcastReceiver.startTrackersAndUploaders(context)
+        keepFlushingToDB(false)
+        TrackerManager.getInstance(application).onResume(this, context)
     }
 
 
