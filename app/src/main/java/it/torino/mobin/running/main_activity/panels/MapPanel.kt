@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -63,8 +64,8 @@ fun MapViewComposable(myViewModel: MyViewModel, interfaceViewModel: InterfaceVie
     //        Log.d("ComposeDebug", "Recomposing with currentIndex: $currentIndex")
     //    }
     val showMarkers by interfaceViewModel.showMarkers.collectAsState()
-
-    val locationsX = myViewModel.tripsList?.value?.getOrNull(myViewModel.currentTripIndex.value ?: 0)?.locations ?: emptyList()
+    val currentTrip = myViewModel.tripsList?.value?.getOrNull(myViewModel.currentTripIndex.value ?: 0)
+    val locationsX = currentTrip?.locations ?: emptyList()
     ConstraintLayout(modifier = Modifier
         .padding(innerPadding)
         .fillMaxSize()) {
@@ -116,19 +117,21 @@ fun MapViewComposable(myViewModel: MyViewModel, interfaceViewModel: InterfaceVie
                 }
         }
 
-        TimeSeriesBarChart(
-            data = getTimeSeriesData(myViewModel, currentIndex),
-            modifier = Modifier
-                .padding(MediumPadding)
-                .constrainAs(graph) {
-                    top.linkTo(box.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                    // This box takes 80% of the parent's height
-                    height = Dimension.percent(0.20f)
-                }
-        )
+        if (currentTrip?.activityType != DetectedActivity.IN_VEHICLE) {
+            TimeSeriesBarChart(
+                data = getTimeSeriesData(myViewModel, currentIndex),
+                modifier = Modifier
+                    .padding(MediumPadding)
+                    .constrainAs(graph) {
+                        top.linkTo(box.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        // This box takes 80% of the parent's height
+                        height = Dimension.percent(0.20f)
+                    }
+            )
+        }
     }
 }
 

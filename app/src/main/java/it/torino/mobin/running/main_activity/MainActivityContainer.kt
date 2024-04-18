@@ -1,6 +1,7 @@
 package it.torino.mobin.running.main_activity
 
 import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -73,6 +74,7 @@ import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.tracker.view_model.MyViewModel
 import java.util.Calendar
 import it.torino.mobin.utils.PreferencesManager
+import it.torino.tracker.TrackerManager
 import it.torino.tracker.utils.Utils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -136,6 +138,7 @@ fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, navController: Nav
                 myViewModel.viewModelScope.launch {
                     // give it the time to flush and compute the results
                     delay(2000)
+                    Log.i(TrackerManager.TAG, "flushing to db ")
                     myViewModel.startTracker(context)
                 }
 
