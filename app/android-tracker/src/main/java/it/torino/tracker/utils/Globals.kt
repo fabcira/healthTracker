@@ -45,10 +45,10 @@ class Globals {
         // server constants to run either locally on a local server or on the official server
 //        const val SERVER_URI: String = "http://192.168.1.160:443"
 //        const val SERVER_URI: String = "https://api2.mobinmobility.org"
-//        const val SERVER_URI: String = "https://dev.mobinmobility.org"
-        const val SERVER_URI: String = "http://localhost"
+        const val SERVER_URI: String = "https://dev.mobinmobility.org"
+//        const val SERVER_URI: String = "http://localhost"
         const val SERVER_REGISTRATION_URL: String = "/user_registration"
-        const val SERVER_PORT: String = ":8092"
+        const val SERVER_PORT: String = "" // "":8092"
         const val ACTIVITIES_ON_SERVER: String = "activities"
         const val LOCATIONS_ON_SERVER: String = "locations"
         const val STEPS_ON_SERVER: String = "steps"
