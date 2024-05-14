@@ -26,7 +26,7 @@ class AccelerometerRecognition(
     private val batchTimeMs = 60000L // Time in milliseconds to force batch insert
     private var lastInsertTime = System.currentTimeMillis()
     private val repositoryInstance: Repository? = Repository.getInstance(context)
-    private val sensorDelay = SensorManager.SENSOR_DELAY_NORMAL
+    private val sensorDelay = SensorManager.SENSOR_DELAY_FASTEST
     private val maxReportLatencyUs = 5 * 60 * 1000000 // 5 minutes in microseconds
 
     private val sensorManager: SensorManager by lazy {
