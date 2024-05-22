@@ -66,16 +66,20 @@
     <string name="physical_activity_permission">I agree to give access to my physical activity data. This does not include any GPS data.</string>
     <string name="accept_tcs">Accept Terms and Conditions?</string>
     <string name="terms_and_conditions">Terms and Conditions</string>
-    <string name="open_battery_permissions">"Open Battery Permissions"</string>
+    <string name="open_battery_permissions">"Open App Info"</string>
     <string name="battery_permissions">"Battery Settings"</string>
     <string name="battery_settings_description"><![CDATA[The app has to run continuously in order to collect accurate data.\n\nClick on Check Settings and follow the instructions below:\n\n1. Open the Settings app on your device and select Battery (or Battery Management or Battery usage)\n2. Select No restrictions (typically it is top item)]]></string>
     <string name="battery_drainage_description"><![CDATA[In the future, your device may display a message informing you that the app uses power in the background and may drain the battery. Ignore that warning. The app has to run continuously in order to collect more accurate data]]></string>
     <string name="A_R_description">In order to accurately record your activity the app needs to access the data from the Physical Activity sensor.</string>
 
-    <string name="battery_permissions_removal">"Battery Settings"</string>
+    <string name="battery_permissions_removal">"Open App Settings"</string>
     <string name="battery_permissions_removal_description"><![CDATA[If you do not open the app for a few days, Android is likely to stop the app\nClick on Check Settings and untick the option Remove Permissions if app is unused]]></string>
-    <string name="battery_permissions_removal_open">"Open Settings"</string>
+    <string name="battery_permissions_removal_open">"Open App Settings"</string>
     <string name="permission_removal_unticked_key">battery_removal_unticked</string>
     <string name="battery_optimised">battery_optimised</string>
     <string name="t_and_c_key">term_and_conditions</string>
+    <string name="start_tracker">Start Tracker</string>
+    <string name="stop_tracker">Stop Tracker</string>
+    <string name="email_body">Here are the files from the active sensors</string>
+    <string name="email_subject">"Sensor results "</string>
 </resources>

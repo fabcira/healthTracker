@@ -59,7 +59,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -70,12 +69,12 @@ import it.torino.mobin.running.main_activity.panels.HealthPanel
 import it.torino.mobin.running.main_activity.panels.HomePanel
 import it.torino.mobin.running.main_activity.panels.MapViewComposable
 import it.torino.mobin.running.main_activity.panels.TripsScreen
+import it.torino.mobin.running.ui_elements.SettingsScreen
 import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.tracker.view_model.MyViewModel
 import java.util.Calendar
-import it.torino.mobin.utils.PreferencesManager
+import it.torino.mobin.utils.SettingsViewModel
 import it.torino.tracker.TrackerManager
-import it.torino.tracker.utils.Utils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -83,7 +82,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainContainer(
     interfaceViewModel: InterfaceViewModel,
-    viewModel: MyViewModel
+    viewModel: MyViewModel,
+    settingsViewModel: SettingsViewModel
 ) {
     val navController: NavHostController = rememberNavController()
 
@@ -101,7 +101,7 @@ fun MainContainer(
         }) {
         Scaffold(
             topBar = {
-                TopTitleBar(viewModel)
+                TopTitleBar(navController, viewModel, settingsViewModel)
             },
             bottomBar = {
                 BottomIconBar(navController = navController, navigationBarHeight,
@@ -118,14 +118,15 @@ fun MainContainer(
                 }
 
                 composable("Health") { HealthPanel(innerPadding) }
+                composable("Settings") { SettingsScreen(navController, viewModel, settingsViewModel) }
             }
-            LifeCycleAwareResultComputation(viewModel, navController, "Home")
+            LifeCycleAwareResultComputation(viewModel, settingsViewModel, navController, "Home")
         }
     }
 }
 
 @Composable
-fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, navController: NavHostController, startDestination: String) {
+fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, settingsViewModel: SettingsViewModel,  navController: NavHostController, startDestination: String) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
@@ -191,7 +192,11 @@ fun BottomIconBar(navController: NavHostController, navigationBarHeight: Dp,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopTitleBar(viewModel: MyViewModel) {
+fun TopTitleBar(
+    navController: NavHostController,
+    viewModel: MyViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     var selectedDate by remember { mutableStateOf("") }
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
@@ -231,6 +236,7 @@ fun TopTitleBar(viewModel: MyViewModel) {
                             val dateInMillis = calendar.timeInMillis
                             // Call the ViewModel's function with the selected date in milliseconds
                             viewModel.setCurrentDateTime(dateInMillis)
+                            viewModel.computeResults()
 
                             // Optionally update the UI
                             selectedDate = "$dayOfMonth/${month + 1}/$year"
@@ -241,8 +247,7 @@ fun TopTitleBar(viewModel: MyViewModel) {
                     text = { Text("Settings") },
                     onClick = {
                         showMenu = false
-                        // Handle "Settings" action
-                    }
+                        navController.navigate("settings")                    }
                 )
             }
         }

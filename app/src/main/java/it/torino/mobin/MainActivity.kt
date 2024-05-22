@@ -37,6 +37,8 @@ import it.torino.mobin.utils.InterfaceViewModel
 import it.torino.mobin.utils.InterfaceViewModelFactory
 import it.torino.mobin.utils.LocalPreferencesManager
 import it.torino.mobin.utils.PreferencesManager
+import it.torino.mobin.utils.SettingsViewModel
+import it.torino.mobin.utils.SettingsViewModelFactory
 import it.torino.tracker.view_model.MyViewModel
 import it.torino.tracker.view_model.MyViewModelFactory
 
@@ -54,6 +56,8 @@ class MainActivity : ComponentActivity() {
                     val interfaceViewModel: InterfaceViewModel by viewModels { interfaceViewModelFactory }
                     val myViewModelFactory = MyViewModelFactory(LocalContext.current)
                     val viewModel: MyViewModel by viewModels { myViewModelFactory }
+                    val settingsViewModelFactory = SettingsViewModelFactory(LocalContext.current)
+                    val settingsViewModel: SettingsViewModel by viewModels { settingsViewModelFactory }
 
                     val navController = rememberNavController()
                     var startDestination = "onboarding"
@@ -88,7 +92,7 @@ class MainActivity : ComponentActivity() {
                         }
                         navigation(startDestination = secondDestination, route = "running") {
                             composable("Home") {
-                                MainContainer(interfaceViewModel, viewModel)
+                                MainContainer(interfaceViewModel, viewModel, settingsViewModel)
                             }
                         }
                     }

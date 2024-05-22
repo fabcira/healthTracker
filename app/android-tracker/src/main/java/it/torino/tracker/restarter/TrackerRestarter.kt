@@ -10,7 +10,18 @@ import android.util.Log
 import androidx.work.*
 import it.torino.tracker.data_upload.data_senders.DataUploadWorker
 import it.torino.tracker.tracker.TackerRestarterWorker
+import it.torino.tracker.tracker.TrackerService
+import it.torino.tracker.view_model.MyViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
+
+private const val TRACKER_WORK_NAME = "tracker_work"
 
 
 class TrackerRestarter {
@@ -18,12 +29,15 @@ class TrackerRestarter {
     private val sensorWorkName = "tracker work manager"
     private val TAG = this::class.simpleName
 
+
     companion object{
         private val _emergencyDataUploadInterval = 15L
         private val _normalDataUploadInterval = 45L
         private val _dataUploadInterval = _emergencyDataUploadInterval
     }
     fun startTrackerAndDataUpload(context: Context) {
+        val viewModel= MyViewModel(context)
+        viewModel.setActive(true)
         startTrackerProper(context)
         startDataUploader(context, true)
     }
@@ -67,6 +81,7 @@ class TrackerRestarter {
      * @param context
      */
     private fun startTrackerProper(context: Context) {
+        TrackerService.timeStamp= getCurrentDateTimeString()
         Log.i(TAG, "Setting constraints for the tracker work manager")
         val constraints = Constraints.Builder()
             .build()
@@ -75,6 +90,42 @@ class TrackerRestarter {
             .setConstraints(constraints)
             .build()
         WorkManager.getInstance(context)
-            .enqueue(request)
+            .enqueueUniqueWork(TRACKER_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
+    }
+
+
+
+
+
+    /**
+     * used to restart the tracker when necessary (e.g. when I change the preferences)
+     * @param context
+     */
+    fun restartTrackerProper(context: Context) {
+        TrackerService.currentTracker?.stopSelf()
+        // Delay the cancellation of the WorkManager task
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(2000) // Delay for 2 seconds to give time to call the onDestroy
+            WorkManager.getInstance(context).cancelUniqueWork(TRACKER_WORK_NAME)
+            startTrackerProper(context)
+        }
+    }
+
+    /**
+     * used to restart the tracker when necessary (e.g. when I change the preferences)
+     * @param context
+     */
+    fun stopTrackerProper(context: Context) {
+        TrackerService.currentTracker?.stopSelf()
+        // Delay the cancellation of the WorkManager task
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(2000) // Delay for 2 seconds to give time to call the onDestroy
+            WorkManager.getInstance(context).cancelUniqueWork(TRACKER_WORK_NAME)
+        }
+    }
+    fun getCurrentDateTimeString(): String {
+        val date = Date()
+        val formatter = SimpleDateFormat("yyyy_MM_dd-HH:mm:ss", Locale.getDefault())
+        return formatter.format(date)
     }
 }

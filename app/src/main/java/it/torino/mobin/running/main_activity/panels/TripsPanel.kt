@@ -39,7 +39,9 @@ fun TripsScreen(viewModel: MyViewModel, navController: NavController, innerPaddi
         .padding(innerPadding)
         ){
         viewModel.tripsList?.value.let{
-         TripsList(navController, viewModel, items =  viewModel.tripsList!!.value!!)
+            viewModel.tripsList?.value?.let{
+                TripsList(navController, viewModel, items =  viewModel.tripsList!!.value!!)
+            }
         }
     }
 }

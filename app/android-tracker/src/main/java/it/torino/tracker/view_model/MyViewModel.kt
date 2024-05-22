@@ -19,10 +19,23 @@ import it.torino.tracker.tracker.sensors.heart_rate_monitor.HeartRateData
 import it.torino.tracker.tracker.sensors.location_recognition.LocationData
 import it.torino.tracker.tracker.sensors.step_counting.StepsData
 import it.torino.tracker.utils.Globals.Companion.MSECS_IN_A_DAY
+import it.torino.tracker.utils.Preferences
 import it.torino.tracker.utils.Utils
 import it.torino.tracker.utils.Utils.Companion.isToday
 
+
 class MyViewModel(val application: Context) : ViewModel() {
+    private val preferences: Preferences = TrackerManager.getInstance(application).getPreferences()
+    val isActive: MutableLiveData<Boolean> = MutableLiveData(preferences.trackerIsActive)
+    val useLocationServices : MutableLiveData<Boolean> =  MutableLiveData(preferences.useLocationTracking)
+    val useActivityRecognition : MutableLiveData<Boolean> =  MutableLiveData(preferences.useActivityRecognition)
+    val useStepCounting : MutableLiveData<Boolean> = MutableLiveData(preferences.useStepCounter)
+    val useAccelerometer : MutableLiveData<Boolean> = MutableLiveData(preferences.useAccelerometer)
+    val useGyro : MutableLiveData<Boolean> = MutableLiveData(preferences.useGyro)
+    val useMagnetometer : MutableLiveData<Boolean> = MutableLiveData(preferences.useMagnetometer)
+    val useHRMonitor: MutableLiveData<Boolean> =  MutableLiveData(preferences.useBodySensors)
+
+
     val relevantLocations: MutableLiveData<List<LocationData>> = MutableLiveData()
     val currentTripIndex: MutableLiveData<Int> = MutableLiveData()
     val currentDateTime: MutableLiveData<Long> = MutableLiveData()
@@ -89,20 +102,28 @@ class MyViewModel(val application: Context) : ViewModel() {
     fun keepFlushingToDB(flush: Boolean) {
         TrackerService.currentTracker?.keepFlushingToDB(flush)
     }
-
+//settingsViewModel.useStepCounting.value,
+//                    settingsViewModel.useActivityRecognition.value,
+//                    settingsViewModel.useLocationServices.value, settingsViewModel.useStepCounting.value
     fun computeResults() {
-        currentDateTime.value.let {
-            Log.i(TAG, "Computing results: viewModel? $this")
-            val midnight = Utils.midnightinMsecs(currentDateTime.value!!)
-            val computeDayDataAsync = ComputeDayDataAsync(
-                application,
-                this,
-                midnight,
-                getEndTime(midnight),
-                true
-            )
-            computeDayDataAsync.computeResultsAsync(this)
+        if (activity_trackingis_on()){
+            currentDateTime.value.let {
+                Log.i(TAG, "Computing results: viewModel? $this")
+                val midnight = Utils.midnightinMsecs(currentDateTime.value!!)
+                val computeDayDataAsync = ComputeDayDataAsync(
+                    application,
+                    this,
+                    midnight,
+                    getEndTime(midnight),
+                    true
+                )
+                computeDayDataAsync.computeResultsAsync(this)
+            }
         }
+    }
+
+    private fun activity_trackingis_on(): Boolean {
+        return (useStepCounting.value!! || useLocationServices.value!! || useActivityRecognition.value!!)
     }
 
     private fun getEndTime(midnight: Long): Long {
@@ -114,7 +135,8 @@ class MyViewModel(val application: Context) : ViewModel() {
 
     fun startTracker(context: Context) {
         keepFlushingToDB(false)
-        TrackerManager.getInstance(application).onResume(this, context)
+        if (isActive.value == true)
+            TrackerManager.getInstance(application).onResume(this, context)
     }
 
 
@@ -124,9 +146,26 @@ class MyViewModel(val application: Context) : ViewModel() {
 
     fun setCurrentDateTime(newTime: Long){
         currentDateTime.value=newTime
-        computeResults()
     }
     fun setCurrentTripIndex(index: Int) {
         currentTripIndex.value=index
     }
+
+    /**
+     * it stops and restarts the tracker
+     */
+    fun restartTracker() {
+        TrackerManager.getInstance(application).restartTracker()
+        isActive.value= true
+    }
+
+    fun stopTracker() {
+        TrackerManager.getInstance(application).stopTracker()
+        isActive.value= false
+    }
+
+    fun setActive(value: Boolean){
+        isActive.value = value
+    }
+
 }

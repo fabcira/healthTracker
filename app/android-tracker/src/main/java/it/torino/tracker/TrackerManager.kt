@@ -11,12 +11,15 @@ import it.torino.tracker.data_upload.UserRegistration
 import it.torino.tracker.restarter.RestartTrackerBroadcastReceiver
 import it.torino.tracker.restarter.TrackerRestarter
 import it.torino.tracker.utils.Globals
+import it.torino.tracker.utils.Preferences
 import it.torino.tracker.utils.PreferencesStore
 import it.torino.tracker.view_model.MyViewModel
 
 class TrackerManager private constructor(private val activity: Context) {
 
     private var useAccelerometer: Boolean = false
+    private var useMagnetometer: Boolean = false
+    private var useGyro : Boolean = false
     private var useBodySensors: Boolean? = false
     private var useLocationTracking: Boolean? = false
     private var useActivityRecognition: Boolean? = false
@@ -70,17 +73,20 @@ class TrackerManager private constructor(private val activity: Context) {
      *
      */
     fun setUpTracker(useStepCounter: Boolean, useActivityRecognition: Boolean, useLocationTracking: Boolean,
-                     useBodySensors: Boolean, useAccelerometer: Boolean, useMobilityModelling: Boolean,
+                     useBodySensors: Boolean, useAccelerometer: Boolean, useGyro: Boolean, useMagnetometer: Boolean,
+                     useMobilityModelling: Boolean,
                      sendData: Boolean) {
         this.useActivityRecognition = useActivityRecognition
         this.useLocationTracking = useLocationTracking
         this.useBodySensors = useBodySensors
         this.useAccelerometer = useAccelerometer
+        this.useGyro = useGyro
+        this.useMagnetometer = useMagnetometer
         this.useStepCounter = useStepCounter
         this.useMobilityModelling = useMobilityModelling
         this.sendData = sendData
         savePreferences(useStepCounter, useActivityRecognition, useLocationTracking, useBodySensors,
-            useAccelerometer, useMobilityModelling, sendData)
+            useAccelerometer, useGyro, useMagnetometer, useMobilityModelling, sendData)
 
     }
 
@@ -93,8 +99,9 @@ class TrackerManager private constructor(private val activity: Context) {
      * @param useBodySensors
      * @param sendData
      */
-    private fun savePreferences(useStepCounter: Boolean, useActivityRecognition: Boolean,
+    fun savePreferences(useStepCounter: Boolean, useActivityRecognition: Boolean,
                                 useLocationTracking: Boolean, useBodySensors: Boolean, useAccelerometer: Boolean,
+                                useGyro: Boolean, useMagnetometer: Boolean,
                                 useMobilityModelling: Boolean, sendData: Boolean) {
         val preference = PreferencesStore()
         preference.setBooleanPreference(activity, Globals.USE_ACTIVITY_RECOGNITION, useActivityRecognition)
@@ -102,10 +109,32 @@ class TrackerManager private constructor(private val activity: Context) {
         preference.setBooleanPreference(activity, Globals.USE_STEP_COUNTER, useStepCounter)
         preference.setBooleanPreference(activity, Globals.USE_HEART_RATE_MONITOR, useBodySensors)
         preference.setBooleanPreference(activity, Globals.USE_ACCELEROMETER, useAccelerometer)
+        preference.setBooleanPreference(activity, Globals.USE_GYRO, useGyro)
+        preference.setBooleanPreference(activity, Globals.USE_MAGNETOMETER, useMagnetometer)
         preference.setBooleanPreference(activity, Globals.USE_MOBILITY_MODELLING, useMobilityModelling)
         preference.setBooleanPreference(activity, Globals.SEND_DATA_TO_SERVER, sendData)
     }
 
+
+    /**
+     * it returns the values of preferences for the tracker as store in the preferences
+     * @return an instance of the class it.torino.tracker.utils.Preferences
+     */
+    fun getPreferences(): Preferences {
+        val preference = PreferencesStore()
+        return Preferences(
+            trackerIsActive = preference.getBooleanPreference(activity, Globals.TRACKER_IS_ACTIVE, true)!!,
+            useStepCounter = preference.getBooleanPreference(activity, Globals.USE_STEP_COUNTER, true)!!,
+            useActivityRecognition = preference.getBooleanPreference(activity, Globals.USE_ACTIVITY_RECOGNITION, true)!!,
+            useLocationTracking = preference.getBooleanPreference(activity, Globals.USE_LOCATION_TRACKING, true)!!,
+            useBodySensors = preference.getBooleanPreference(activity, Globals.USE_HEART_RATE_MONITOR, false)!!,
+            useAccelerometer = preference.getBooleanPreference(activity, Globals.USE_ACCELEROMETER, false)!!,
+            useGyro = preference.getBooleanPreference(activity, Globals.USE_GYRO, false)!!,
+            useMagnetometer = preference.getBooleanPreference(activity, Globals.USE_MAGNETOMETER, false)!!,
+            useMobilityModelling = preference.getBooleanPreference(activity, Globals.USE_MOBILITY_MODELLING, false)!!,
+            sendData = preference.getBooleanPreference(activity, Globals.SEND_DATA_TO_SERVER, false)!!
+        )
+    }
 
 
     fun startTracker() {
@@ -113,6 +142,20 @@ class TrackerManager private constructor(private val activity: Context) {
         // is being blocked
         val trackerRestarter = TrackerRestarter()
         trackerRestarter.startTrackerAndDataUpload(activity)
+    }
+
+    /**
+     * it stops the tracker and restarts it. Typically used when I change the preferences for the
+     * tracker (e.g. I start the accelerometer)
+     */
+    fun restartTracker(){
+        val trackerRestarter = TrackerRestarter()
+        trackerRestarter.restartTrackerProper(activity)
+    }
+
+    fun stopTracker(){
+        val trackerRestarter = TrackerRestarter()
+        trackerRestarter.stopTrackerProper(activity)
     }
 
 
@@ -133,4 +176,5 @@ class TrackerManager private constructor(private val activity: Context) {
         val userPreferences = PreferencesStore()
         userPreferences.setStringPreference(activity, Globals.USER_ID, userId)
     }
+
 }

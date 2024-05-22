@@ -12,6 +12,8 @@ package it.torino.tracker.utils
 //
 class Globals {
     companion object {
+
+        const val TRACKER_IS_ACTIVE: String = "TRACKER_IS_ACTIVE"
         const val TIME_IN_MILLIS: String = "timeInMsecs"
         const val CREATED_AT: String = "createdAt"
         const val HEIGHT: String = "userHeight"
@@ -73,6 +75,8 @@ class Globals {
         const val USE_HEART_RATE_MONITOR: String = "use_hr_monitor"
         const val USE_MOBILITY_MODELLING: String = "use_mobility_modelling"
         const val USE_ACCELEROMETER: String = "use_accelerometer"
+        const val USE_MAGNETOMETER: String = "USE_MAGNETOMETER"
+        const val USE_GYRO: String = "USE_GYRO"
 
         const val EMPTY = ""
         const val INVALID = -1
@@ -82,6 +86,10 @@ class Globals {
         const val POWER_PREFERENCES_2_GRANTED: String = "power_preferences_2_granted_3"
         const val WEAR_ID_SUFFIX: String = "_wear"
 
+
+        const val FILE_ACCELEROMETER: String = "accelerometer_"
+        const val FILE_GYRO: String = "gyro_"
+        const val FILE_MAGNETOMETER: String = "magnetometer_"
     }
 
 }

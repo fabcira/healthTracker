@@ -18,6 +18,8 @@ fun finaliseOnboarding(context: Context, activity: MainActivity, viewModel: MyVi
         useLocationTracking = true,
         useBodySensors = false,
         useAccelerometer = false,
+        useGyro = false,
+        useMagnetometer = false,
         useMobilityModelling = true,
         sendData = true
     )

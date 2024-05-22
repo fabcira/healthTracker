@@ -6,15 +6,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * Color.LightGray
  */
 @Composable
-fun StepsProgressDial(circleColour: Color, excessArcColour: Color, arcColour: Color, progress: Float) {
+fun StepsProgressDial(circleColour: Color, excessArcColour: Color, arcColour: Color, progress: Float,
+                      writing: String) {
 
     Canvas(modifier = Modifier.size(250.dp)) {
         val strokeWidth = 80f
@@ -43,11 +47,11 @@ fun StepsProgressDial(circleColour: Color, excessArcColour: Color, arcColour: Co
         )
 
         // Draw excess arc - just whatever is above 360 degrees
-        if (sweepAngle>360) {
+        if (sweepAngle > 360) {
             drawArc(
                 color = excessArcColour,
                 startAngle = -90f,
-                sweepAngle = sweepAngle -360,
+                sweepAngle = sweepAngle - 360,
                 useCenter = false,
                 style = Stroke(width = strokeWidth),
                 topLeft = Offset(center.x - radius, center.y - radius),
@@ -55,14 +59,28 @@ fun StepsProgressDial(circleColour: Color, excessArcColour: Color, arcColour: Co
             )
         }
 
+        // Draw the text in the center
+        drawContext.canvas.nativeCanvas.apply {
+            val textSize = 20.sp.toPx()
+            val paint = android.graphics.Paint().apply {
+                isAntiAlias = true
+                textAlign = android.graphics.Paint.Align.CENTER
+                this.textSize = textSize
+                color = android.graphics.Color.BLACK
+            }
+            drawText(
+                writing,
+                center.x,
+                center.y + textSize / 4, // Adjust to center vertically
+                paint
+            )
+        }
     }
-
-
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun myPreview() {
-    StepsProgressDial(Color.LightGray, Color.White, Color.Blue, 0.6f)
+    StepsProgressDial(Color.LightGray, Color.White, Color.Blue, 0.6f, "start")
 }
