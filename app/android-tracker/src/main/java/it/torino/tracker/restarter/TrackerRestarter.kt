@@ -36,8 +36,6 @@ class TrackerRestarter {
         private val _dataUploadInterval = _emergencyDataUploadInterval
     }
     fun startTrackerAndDataUpload(context: Context) {
-        val viewModel= MyViewModel(context)
-        viewModel.setActive(true)
         startTrackerProper(context)
         startDataUploader(context, true)
     }
@@ -81,7 +79,6 @@ class TrackerRestarter {
      * @param context
      */
     private fun startTrackerProper(context: Context) {
-        TrackerService.timeStamp= getCurrentDateTimeString()
         Log.i(TAG, "Setting constraints for the tracker work manager")
         val constraints = Constraints.Builder()
             .build()
@@ -122,10 +119,5 @@ class TrackerRestarter {
             delay(2000) // Delay for 2 seconds to give time to call the onDestroy
             WorkManager.getInstance(context).cancelUniqueWork(TRACKER_WORK_NAME)
         }
-    }
-    fun getCurrentDateTimeString(): String {
-        val date = Date()
-        val formatter = SimpleDateFormat("yyyy_MM_dd-HH:mm:ss", Locale.getDefault())
-        return formatter.format(date)
     }
 }

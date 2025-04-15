@@ -10,9 +10,11 @@ import android.util.Log
 import it.torino.tracker.data_upload.UserRegistration
 import it.torino.tracker.restarter.RestartTrackerBroadcastReceiver
 import it.torino.tracker.restarter.TrackerRestarter
+import it.torino.tracker.tracker.TrackerService
 import it.torino.tracker.utils.Globals
 import it.torino.tracker.utils.Preferences
 import it.torino.tracker.utils.PreferencesStore
+import it.torino.tracker.utils.Utils
 import it.torino.tracker.view_model.MyViewModel
 
 class TrackerManager private constructor(private val activity: Context) {
@@ -116,6 +118,10 @@ class TrackerManager private constructor(private val activity: Context) {
     }
 
 
+    fun setTrackerActive(activity: Context, value: Boolean){
+        val preference = PreferencesStore()
+        preference.setBooleanPreference(activity, Globals.TRACKER_IS_ACTIVE, value)
+    }
     /**
      * it returns the values of preferences for the tracker as store in the preferences
      * @return an instance of the class it.torino.tracker.utils.Preferences
@@ -123,7 +129,7 @@ class TrackerManager private constructor(private val activity: Context) {
     fun getPreferences(): Preferences {
         val preference = PreferencesStore()
         return Preferences(
-            trackerIsActive = preference.getBooleanPreference(activity, Globals.TRACKER_IS_ACTIVE, true)!!,
+            trackerIsActive = preference.getBooleanPreference(activity, Globals.TRACKER_IS_ACTIVE, false)!!,
             useStepCounter = preference.getBooleanPreference(activity, Globals.USE_STEP_COUNTER, true)!!,
             useActivityRecognition = preference.getBooleanPreference(activity, Globals.USE_ACTIVITY_RECOGNITION, true)!!,
             useLocationTracking = preference.getBooleanPreference(activity, Globals.USE_LOCATION_TRACKING, true)!!,
@@ -175,6 +181,21 @@ class TrackerManager private constructor(private val activity: Context) {
     fun saveUserRegistrationId(userId: String) {
         val userPreferences = PreferencesStore()
         userPreferences.setStringPreference(activity, Globals.USER_ID, userId)
+    }
+
+    fun setTimeStamp(activity: Context, timeStamp: String) {
+        val userPreferences = PreferencesStore()
+        userPreferences.setStringPreference(activity, Globals.TIME_STAMP, timeStamp)
+        TrackerService.timeStamp= timeStamp
+    }
+    fun getTimeStamp(activity: Context): String {
+        val userPreferences = PreferencesStore()
+        val utils = Utils()
+        val tmstp =
+            if (TrackerService.timeStamp != TrackerService.INVALID_TIME)
+                TrackerService.timeStamp
+            else utils.getCurrentDateTimeString()
+        return userPreferences.getStringPreference(activity, Globals.TIME_STAMP, tmstp)!!
     }
 
 }

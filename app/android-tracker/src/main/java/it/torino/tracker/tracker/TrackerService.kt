@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.DetectedActivity
 import it.torino.tracker.Repository
-import it.torino.tracker.TrackerManager
 import it.torino.tracker.tracker.sensors.accelerometer.AccelerometerRecognition
 import it.torino.tracker.tracker.sensors.activity_recognition.ActivityData
 import it.torino.tracker.tracker.sensors.activity_recognition.ActivityRecognition
@@ -33,11 +32,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 
 
 class TrackerService : LifecycleService() {
@@ -48,8 +42,8 @@ class TrackerService : LifecycleService() {
     var stepCounter: StepCounter? = null
     var heartMonitor: HeartRateMonitor? = null
     var accelerometer: AccelerometerRecognition? = null
-    var gyro: GyroRecognition? = null
-    var magnetometer: MagnetometerRecognition? = null
+    private var gyro: GyroRecognition? = null
+    private var magnetometer: MagnetometerRecognition? = null
     var activityRecognition: ActivityRecognition? = null
     private var significantMotionSensor: SignificantMotionSensor? = null
 
@@ -69,9 +63,10 @@ class TrackerService : LifecycleService() {
 
 
     companion object {
+        const val INVALID_TIME = "no_data"
         var currentTracker: TrackerService? = null
         private const val NOTIFICATION_ID = 9974
-        var timeStamp = "no_data"
+        var timeStamp = INVALID_TIME
     }
 
     override fun onCreate() {
@@ -101,25 +96,39 @@ class TrackerService : LifecycleService() {
 
         repository = Repository.getInstance(this)
 
-        if (locationTracker == null && useLocationTracking == true)
+        if (locationTracker == null && useLocationTracking == true) {
             locationTracker = LocationTracker(this, lifecycleScope, repository)
-        if (activityRecognition == null && useActivityRecognition == true)
+            Log.i("LOCATION", "creating location tracker")
+        }
+        if (activityRecognition == null && useActivityRecognition == true) {
             activityRecognition = ActivityRecognition(this, lifecycleScope, repository)
+            Log.i("AR", "creating activity recognition")
+        }
         // for the step counter we need to set up the attributiontag context as a context
-        if (stepCounter == null && useStepCounter == true)
+        if (stepCounter == null && useStepCounter == true) {
+            Log.i("STEP", "creating step counter")
             stepCounter = StepCounter(attributionContext)
-        if (heartMonitor == null && useHRmonitoring == true)
-        // for the hr monitor we need to set up the attributiontag context as a context
+        }
+        if (heartMonitor == null && useHRmonitoring == true) {
+            // for the hr monitor we need to set up the attributiontag context as a context
+            Log.i("HR", "creating hr monitor")
             heartMonitor = HeartRateMonitor(attributionContext, lifecycleScope, repository)
-        if (accelerometer == null && useAccelerometer == true)
-        // for the hr monitor we need to set up the attributiontag context as a context
-            accelerometer = AccelerometerRecognition(attributionContext, lifecycleScope, timeStamp)
-        if (gyro == null && useGyro == true)
-        // for the hr monitor we need to set up the attributiontag context as a context
-            gyro = GyroRecognition(attributionContext, lifecycleScope, timeStamp)
-        if (magnetometer == null && useMagnetometer == true)
-        // for the hr monitor we need to set up the attributiontag context as a context
-            magnetometer = MagnetometerRecognition(attributionContext, lifecycleScope, timeStamp)
+        }
+        if (accelerometer == null && useAccelerometer == true) {
+            // for the hr monitor we need to set up the attributiontag context as a context
+            Log.i("ACCELEROMETER", "creating accelerometer")
+            accelerometer = AccelerometerRecognition(attributionContext)
+        }
+        if (gyro == null && useGyro == true) {
+            // for the hr monitor we need to set up the attributiontag context as a context
+            Log.i("GYRO", "creating gyro")
+            gyro = GyroRecognition(attributionContext)
+        }
+        if (magnetometer == null && useMagnetometer == true) {
+            // for the hr monitor we need to set up the attributiontag context as a context
+            Log.i("MAGNETOMETER", "creating magnetometer")
+            magnetometer = MagnetometerRecognition(attributionContext)
+        }
 
         initCountDownToStoppingSensors()
     }
@@ -280,6 +289,8 @@ class TrackerService : LifecycleService() {
             Log.i(TAG, "Stopping accelerometer ${System.currentTimeMillis()}")
             accelerometerJob?.cancel()
             accelerometer?.stopTracking()
+            // redefine the accelerometer or this stop will stop also the next starting
+//            accelerometer = AccelerometerRecognition(attributionContext)
         } catch (e: Exception) {
             Log.i(TAG, "accelerometer did not stop " + e.message)
         }
@@ -287,6 +298,8 @@ class TrackerService : LifecycleService() {
             Log.i(TAG, "Stopping gyro ${System.currentTimeMillis()}")
             gyroJob?.cancel()
             gyro?.stopTracking()
+            // redefine the gyro or this stop will stop also the next starting
+//            gyro = GyroRecognition(attributionContext)
         } catch (e: Exception) {
             Log.i(TAG, "gyro did not stop " + e.message)
         }
@@ -294,6 +307,8 @@ class TrackerService : LifecycleService() {
             Log.i(TAG, "Stopping magnetometer ${System.currentTimeMillis()}")
             magnetometerJob?.cancel()
             magnetometer?.stopTracking()
+            // redefine the magnet or this stop will stop also the next starting
+//            magnetometer = MagnetometerRecognition(attributionContext)
         } catch (e: Exception) {
             Log.i(TAG, "magnetometer did not stop " + e.message)
         }

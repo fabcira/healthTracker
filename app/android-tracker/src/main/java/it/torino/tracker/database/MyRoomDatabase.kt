@@ -33,7 +33,8 @@ import it.torino.tracker.tracker.sensors.symptoms.SymptomsData
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 9, to = 10)
-    ]
+    ],
+
 )
 abstract class MyRoomDatabase : RoomDatabase() {
     abstract fun myStepDataDao(): StepsDataDAO?
@@ -46,8 +47,8 @@ abstract class MyRoomDatabase : RoomDatabase() {
 
     companion object {
         private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
                     "CREATE TABLE IF NOT EXISTS TripData (" +
                             "id INTEGER NOT NULL," +
                             "startTime INTEGER NOT NULL," +
@@ -61,8 +62,8 @@ abstract class MyRoomDatabase : RoomDatabase() {
             }
         }
         private val MIGRATION_4_5: Migration = object : Migration(4, 5) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
                     "CREATE TABLE IF NOT EXISTS HeartRateData (" +
                             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                             "timeInMsecs INTEGER NOT NULL, " +
@@ -75,8 +76,8 @@ abstract class MyRoomDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_6_7: Migration = object : Migration(6, 7) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
                     "CREATE TABLE IF NOT EXISTS SymptomsData (" +
                             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                             "timeInMsecs INTEGER NOT NULL, " +
@@ -84,14 +85,14 @@ abstract class MyRoomDatabase : RoomDatabase() {
                             "timeZone INTEGER NOT NULL, " +
                             "uploaded INTEGER NOT NULL)"
                 )
-                database.execSQL(
+                db.execSQL(
                     "CREATE  INDEX IF NOT EXISTS index_SymptomsData_timeInMsecs  ON SymptomsData (timeInMsecs) "
                 )
             }
         }
         private val MIGRATION_8_9: Migration = object : Migration(8, 9) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
                     "CREATE UNIQUE INDEX IF NOT EXISTS `index_activities_timeInMillis_activityType` ON `activities` (`timeInMillis`, `activityType`)"
                 )
             }
@@ -113,7 +114,7 @@ abstract class MyRoomDatabase : RoomDatabase() {
                             // how to add a migration
                             .addMigrations(MIGRATION_2_3, MIGRATION_4_5, MIGRATION_6_7, MIGRATION_8_9)
                             // Wipes and rebuilds instead of migrating if no Migration object.
-                            .fallbackToDestructiveMigration()
+                            .fallbackToDestructiveMigration(false)
                             .addCallback(roomDatabaseCallback)
                             .build()
                     }

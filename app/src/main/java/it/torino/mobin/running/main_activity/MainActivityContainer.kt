@@ -39,6 +39,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -88,7 +89,7 @@ fun MainContainer(
     val navController: NavHostController = rememberNavController()
 
     val navigationBarHeight = 88.dp
-    val selectedIndex by remember { mutableStateOf(1) }
+    val selectedIndex by remember { mutableIntStateOf(1) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -105,12 +106,12 @@ fun MainContainer(
             },
             bottomBar = {
                 BottomIconBar(navController = navController, navigationBarHeight,
-                    selectedIndexState = remember { mutableStateOf(selectedIndex) })
+                    selectedIndexState = remember { mutableIntStateOf(selectedIndex) })
             }
         ) { innerPadding ->
             NavHost(navController = navController, startDestination = "Home") {
                 composable("Home") {
-                    HomePanel(viewModel, innerPadding)
+                    HomePanel(viewModel, settingsViewModel, innerPadding)
                 }
                 composable("Trips") { TripsScreen(viewModel, navController, innerPadding) }
                 composable("Map") {
@@ -127,7 +128,7 @@ fun MainContainer(
 
 @Composable
 fun LifeCycleAwareResultComputation(myViewModel: MyViewModel, settingsViewModel: SettingsViewModel,  navController: NavHostController, startDestination: String) {
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val context = LocalContext.current
 
     DisposableEffect(lifecycleOwner) {

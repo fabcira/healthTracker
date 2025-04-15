@@ -76,6 +76,7 @@
     <string name="battery_permissions_removal_description"><![CDATA[If you do not open the app for a few days, Android is likely to stop the app\nClick on Check Settings and untick the option Remove Permissions if app is unused]]></string>
     <string name="battery_permissions_removal_open">"Open App Settings"</string>
     <string name="permission_removal_unticked_key">battery_removal_unticked</string>
+    <string name="onboarding_finalised">onboarding_finalised</string>
     <string name="battery_optimised">battery_optimised</string>
     <string name="t_and_c_key">term_and_conditions</string>
     <string name="start_tracker">Start Tracker</string>

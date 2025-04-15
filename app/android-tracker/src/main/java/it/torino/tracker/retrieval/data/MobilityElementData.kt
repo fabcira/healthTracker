@@ -11,11 +11,6 @@ import it.torino.tracker.tracker.sensors.activity_recognition.ActivityData
 import it.torino.tracker.tracker.sensors.location_recognition.LocationData
 import it.torino.tracker.utils.Utils
 
-
-//
-// Created by Fabio Ciravegna on 25/02/2022.
-// Copyright (c) 2022 The University of Sheffield. All rights reserved.
-//
 class MobilityElementData(var timeInMSecs: Long) {
     companion object {
         const val INVALID_VALUE = -100

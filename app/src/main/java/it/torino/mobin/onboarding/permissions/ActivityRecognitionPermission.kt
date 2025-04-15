@@ -45,15 +45,15 @@ fun ActivityRecognitionPermissions(activity: MainActivity, navController: NavHos
     var activityRecognitionGranted by remember { mutableStateOf(false) }
 
 
-    var activityRecognitionPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    val activityRecognitionPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         rememberPermissionState(android.Manifest.permission.ACTIVITY_RECOGNITION)
     } else {
         // Pre-Q does not require this permission, treat as always granted
         null
     }
     val showForegroundRationale = activityRecognitionPermissionState?.let {
-        (activityRecognitionPermissionState?.status is PermissionStatus.Denied &&
-                (activityRecognitionPermissionState?.status as PermissionStatus.Denied).shouldShowRationale)
+        (activityRecognitionPermissionState.status is PermissionStatus.Denied &&
+                (activityRecognitionPermissionState.status as PermissionStatus.Denied).shouldShowRationale)
     } ?: false
 
 

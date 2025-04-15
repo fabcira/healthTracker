@@ -4,6 +4,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.compose.compiler)
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27"
 }
 
 val localProperties =  Properties()
@@ -16,7 +18,7 @@ if (localPropertiesFile.exists()) {
 
 android {
     namespace = "it.torino.mobin"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         // Enable the generation of BuildConfig fields
@@ -26,7 +28,7 @@ android {
     defaultConfig {
         applicationId = "it.torino.mobin"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 2
         versionName = "1.1"
 
@@ -78,6 +80,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
+
     buildFeatures {
         compose = true
     }
@@ -93,7 +99,6 @@ android {
 
 dependencies {
     implementation(project(":app:android-tracker"))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -104,6 +109,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.navigation.compose)
     implementation(libs.androidbrowserhelper)
+    ksp(libs.dagger.compiler)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     // Kotlin BOM
     implementation(platform(libs.kotlin.bom))

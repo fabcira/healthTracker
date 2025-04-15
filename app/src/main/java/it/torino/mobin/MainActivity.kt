@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import it.torino.mobin.onboarding.finaliseOnboarding
 import it.torino.mobin.onboarding.permissions.ActivityRecognitionPermissions
 import it.torino.mobin.onboarding.permissions.BatteryOptimisation
 import it.torino.mobin.onboarding.permissions.BatteryPermissionsRemoval
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MobinTheme {
                 val context = LocalContext.current
+                val appContext = context.applicationContext
                 CompositionLocalProvider(LocalPreferencesManager provides PreferencesManager(context)) {
                     val preferencesManager = LocalPreferencesManager.current
                     val interfaceViewModelFactory = InterfaceViewModelFactory(LocalContext.current)
@@ -88,6 +90,9 @@ class MainActivity : ComponentActivity() {
                             composable("Battery_permissions_removal"){
                                 BatteryPermissionsRemoval(navController, preferencesManager)
                             }
+                            composable("Finalise_onBoarding"){
+                                finaliseOnboarding(appContext, viewModel, navController, preferencesManager)
+                            }
 
                         }
                         navigation(startDestination = secondDestination, route = "running") {
@@ -103,6 +108,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+fun onBoardingFinalised(context: Context, preferencesManager: PreferencesManager): Boolean {
+    val myPreferenceKey = context.getString(R.string.onboarding_finalised)
+    // Check and react to the permission state
+    return preferencesManager.getBoolean(myPreferenceKey)
+}
 /**
  * it chooses teh next onboarding route given teh status of the permissions
  */
@@ -121,6 +132,8 @@ fun getNextNavigationRouteDuringOnboarding(context: Context, preferencesManager:
         secondDestination = "Battery_optimisation"
     } else if(!batteryPermissionsRemovalRemoved(context, preferencesManager)){
         secondDestination = "Battery_permissions_removal"
+    } else if(!onBoardingFinalised(context, preferencesManager)){
+        secondDestination = "Finalise_onBoarding"
     }
     return secondDestination
 }

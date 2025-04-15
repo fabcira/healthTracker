@@ -112,4 +112,14 @@ class Utils {
                     now[Calendar.YEAR] == comparisonDate[Calendar.YEAR]
         }
     }
+
+
+    /**
+     * @return a timestring of the current time
+     */
+    fun getCurrentDateTimeString(): String {
+        val date = Date()
+        val formatter = SimpleDateFormat("yyyy_MM_dd-HH:mm:ss", Locale.getDefault())
+        return formatter.format(date)
+    }
 }

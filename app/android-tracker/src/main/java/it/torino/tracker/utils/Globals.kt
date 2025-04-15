@@ -13,7 +13,8 @@ package it.torino.tracker.utils
 class Globals {
     companion object {
 
-        const val TRACKER_IS_ACTIVE: String = "TRACKER_IS_ACTIVE"
+        const val TIME_STAMP: String = "TIME_STAMP"
+        const val TRACKER_IS_ACTIVE: String = "TRACKER_IS_ACTIVE_"
         const val TIME_IN_MILLIS: String = "timeInMsecs"
         const val CREATED_AT: String = "createdAt"
         const val HEIGHT: String = "userHeight"

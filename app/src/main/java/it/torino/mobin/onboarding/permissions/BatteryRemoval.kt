@@ -101,6 +101,9 @@ fun batteryPermissionsRemovalRemoved(context: Context, preferencesManager: Prefe
     return preferencesManager.getBoolean(myPreferenceKey)
 }
 
+
+
+
 @Preview
 @Composable
 private fun Preview() {

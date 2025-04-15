@@ -20,6 +20,18 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-dontwarn java.lang.invoke.StringConcatFactory
+
+##-------- rules for removing Log methods in release
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+
 
 -keep class it.torino.tracker.data_upload.dto.** {*;}
 
@@ -34,12 +46,12 @@
 -keep class it.torino.tracker.retrieval.data.TripData { *; }
 -keep class it.torino.tracker.retrieval.data.SummaryData { *; }
 
--keep class it.torino.tracker.data_upload.dts_data.ActivityDataDTS { *; }
--keep class it.torino.tracker.data_upload.dts_data.SymptomsDataDTS { *; }
--keep class it.torino.tracker.data_upload.dts_data.HeartRateDataDTS { *; }
--keep class it.torino.tracker.data_upload.dts_data.LocationDataDTS { *; }
--keep class it.torino.tracker.data_upload.dts_data.StepsDataDTS { *; }
--keep class it.torino.tracker.data_upload.dts_data.TripDataDTS{ *; }
+-keep class it.torino.tracker.data_upload.data_senders.ActivityDataSender { *; }
+#-keep class it.torino.tracker.data_upload.data_senders.SymptomsDataSender { *; }
+-keep class it.torino.tracker.data_upload.data_senders.HeartRateDataSender { *; }
+-keep class it.torino.tracker.data_upload.data_senders.LocationDataSender { *; }
+-keep class it.torino.tracker.data_upload.data_senders.StepsDataSender { *; }
+-keep class it.torino.tracker.data_upload.data_senders.TripsDataSender{ *; }
 
 
 # for GSonObjects
@@ -54,12 +66,23 @@
 -keep class it.torino.tracker.data_upload.dts_data.** {*;}
 
 
- ##-------- rules for removing Log methods in release
--assumenosideeffects class android.util.Log {
-  public static boolean isLoggable(java.lang.String, int);
-  public static int v(...);
-  public static int i(...);
-  public static int w(...);
-  public static int d(...);
-  public static int e(...);
-}
+## Keep ViewModelFactory and other necessary classes
+-keep class it.torino.tracker.view_model.MyViewModelFactory { *; }
+-keep class it.torino.tracker.view_model.** { *; }
+
+
+## Keep ViewModelFactory and other necessary classes
+-keep class it.torino.tracker.TrackerManager { *; }
+-keep class it.torino.tracker.TrackerManager$Companion { *; }
+
+-keep class it.torino.tracker.utils.Preferences { *; }
+
+-keep class it.torino.tracker.retrieval.MobilityResultComputation { *; }
+-keep class it.torino.tracker.utils.Utils { *; }
+-keep class it.torino.tracker.utils.Utils$Companion { *; }
+
+-keep class it.torino.tracker.utils.Utils$Companion { *; }
+-keep class  it.torino.tracker.retrieval.data.MobilityElementData { *; }
+-keep class  it.torino.tracker.retrieval.data.SummaryData { *; }
+-keep class  it.torino.tracker.retrieval.data.TripData { *; }
+

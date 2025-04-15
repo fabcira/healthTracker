@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,11 +33,23 @@ import it.torino.tracker.view_model.MyViewModel
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import it.torino.mobin.utils.SettingsViewModel
+import it.torino.tracker.TrackerManager
 import it.torino.tracker.tracker.TrackerService
 import it.torino.tracker.utils.Globals
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 
 const val heartMinutesTarget = 40
@@ -48,6 +59,7 @@ const val stepsTarget = 10000
 @Composable
 fun HomePanel(
     trackerViewModel: MyViewModel,
+    settingsViewModel: SettingsViewModel,
     innerPadding: PaddingValues
 ) {
     val context = LocalContext.current
@@ -55,6 +67,8 @@ fun HomePanel(
     val cardColors = CardDefaults.cardColors(
         containerColor = Color.Transparent // Setting the card background to transparent
     )
+    var isLoading by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxSize()
@@ -89,17 +103,23 @@ fun HomePanel(
                     .clickable {
                         if (isActive != false) {
                             val body =
-                                "${context.getString(R.string.email_subject)} for ${TrackerService.timeStamp}"
+                                "${context.getString(R.string.email_subject)} for ${trackerViewModel.getCurrentTimeStamp(context)}"
                             trackerViewModel.stopTracker()
-                            val fileList = getSensorFiles(context)
-                            if (fileList.size>0) {
-                                sendEmailWithAttachment(
-                                    context,
-                                    "fabio.ciravegna@unito.it",
-                                    context.getString(R.string.email_body),
-                                    body,
-                                    fileList
-                                )
+                            isLoading = true
+                            CoroutineScope(Dispatchers.IO).launch {
+                                delay(5000)
+                                val fileList = getSensorFiles(context, trackerViewModel)
+                                Log.i("SAVING!!","Saving ${fileList.size} files ")
+                                if (fileList.isNotEmpty()) {
+                                    sendEmailWithAttachment(
+                                        context,
+                                        "fabio.ciravegna@unito.it",
+                                        context.getString(R.string.email_body),
+                                        body,
+                                        fileList
+                                    )
+                                }
+                                isLoading = false
                             }
                         } else {
                             trackerViewModel.restartTracker()
@@ -162,10 +182,19 @@ fun HomePanel(
             }
         }
     }
+    // Overlay spinner when loading
+    if (isLoading) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .fillMaxSize() // Adjust as needed
+                .background(Color(0x80000000)) // Semi-transparent background
+                .wrapContentSize(Alignment.Center) // Centers the spinner within the box
+        )
+    }
 }
 
-fun getSensorFiles(context: Context): List<File> {
-    val timeStamp = TrackerService.timeStamp
+fun getSensorFiles(context: Context, trackerViewModel: MyViewModel): List<File> {
+    val timeStamp = trackerViewModel.getCurrentTimeStamp(context)
     val finList : MutableList<File> = mutableListOf()
     val fileAcc = File(context.getExternalFilesDir(null), "${Globals.FILE_ACCELEROMETER}${timeStamp}.csv")
     if (fileAcc.exists()){

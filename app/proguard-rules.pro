@@ -19,3 +19,23 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+ ##-------- rules for removing Log methods in release
+ -assumenosideeffects class android.util.Log {
+     public static boolean isLoggable(java.lang.String, int);
+     public static int v(...);
+     public static int i(...);
+     public static int w(...);
+     public static int d(...);
+     public static int e(...);
+ }
+
+## Keep essential classes and methods
+-keep class * extends android.app.Application { *; }
+-keep class * extends android.app.Activity { *; }
+-keep class * extends android.app.Service { *; }
+-keep class * extends android.content.BroadcastReceiver { *; }
+-keep class * extends android.content.ContentProvider { *; }
+-keepattributes Signature
+-keepattributes *Annotation*

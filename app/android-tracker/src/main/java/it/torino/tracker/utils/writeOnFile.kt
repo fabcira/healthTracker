@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -31,6 +32,7 @@ fun processDataAndWriteToFile(context: Context, queue: ConcurrentLinkedQueue<Sen
     scope.launch {
         mutex.withLock {
             val file = getWritableFile(context, fileName)
+            Log.i("processDataAndWriteToFile", "Writing to file: ${file.absolutePath}")
             try {
                 FileWriter(file, true).use { writer ->
                     while (queue.isNotEmpty()) {
@@ -57,6 +59,9 @@ fun processDataAndWriteToFile(context: Context, queue: ConcurrentLinkedQueue<Sen
 fun getWritableFile(context: Context, fileName: String): File {
     // Get the directory for the app's private files on external storage
     val directory = context.getExternalFilesDir(null)
+    if (directory != null && !directory.exists()) {
+        directory.mkdirs()
+    }
     // Create a file object for the given file name
     return File(directory, fileName)
 }

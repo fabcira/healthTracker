@@ -7,14 +7,15 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id "com.android.library"
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27"
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdk 23
-        targetSdk 34
+        targetSdk 35
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
@@ -27,10 +28,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            consumerProguardFiles 'proguard-rules.pro'
-            jniDebuggable false
+            minifyEnabled = true // Correct property name
+            proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+            )
+            consumerProguardFiles("proguard-rules.pro")
+            jniDebuggable = false
         }
         debug {
             minifyEnabled false
@@ -51,6 +55,10 @@ android {
         jvmTarget = '17'
     }
 
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
+
     buildFeatures {
         viewBinding true
     }
@@ -60,36 +68,37 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation libs.androidx.core.ktx.v1120
+    implementation libs.androidx.appcompat
+    implementation libs.material.v1110
 
-    implementation 'androidx.room:room-runtime:2.6.1'
-    kapt 'androidx.room:room-compiler:2.6.1'
-    implementation "androidx.room:room-ktx:<version>"
 
-    implementation "androidx.sqlite:sqlite:2.4.0"
+    implementation libs.androidx.sqlite
 
-    implementation 'androidx.preference:preference:1.2.1'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation libs.androidx.preference
+    implementation libs.gson
 
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'com.google.firebase:firebase-common:20.4.3'
-    implementation 'com.google.android.gms:play-services-location:21.2.0'
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
-    implementation "androidx.lifecycle:lifecycle-service:2.7.0"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
+    implementation libs.androidx.lifecycle.livedata.ktx.v270
+    implementation libs.androidx.lifecycle.viewmodel.ktx.v270
+    implementation libs.google.firebase.common.v2043
+    implementation libs.play.services.location
+    implementation libs.android.maps
+    implementation libs.androidx.lifecycle.service.v270
+    implementation libs.androidx.lifecycle.runtime.ktx.v270
 
-    implementation 'com.google.firebase:firebase-common:20.4.3'
+    implementation libs.firebase.common
 
     // WorkManager dependency
-    implementation "androidx.work:work-runtime-ktx:2.9.0"
-    implementation 'com.github.judemanutd:autostarter:1.1.0'
+    implementation libs.androidx.work.runtime.ktx
+    implementation libs.autostarter
 
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
+    implementation libs.androidx.lifecycle.viewmodel.ktx
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.junit.v115
+    androidTestImplementation libs.androidx.espresso.core.v351
 }

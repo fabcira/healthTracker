@@ -55,7 +55,8 @@ class SettingsViewModel(private val applicationContext: Context) : ViewModel() {
             useGyro = useGyro.value,
             useMagnetometer = useMagnetometer.value,
             useMobilityModelling = false,  // Set this according to your app's requirements
-            sendData = false  // Set this according to your app's requirements
+            sendData = (useStepCounting.value || useActivityRecognition.value || useLocationServices.value
+                    || useHRMonitor.value)  // Set this according to your app's requirements
         )
     }
 

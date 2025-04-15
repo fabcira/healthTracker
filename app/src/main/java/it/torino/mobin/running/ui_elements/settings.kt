@@ -79,6 +79,9 @@ fun SettingsScreen(navController: NavHostController, trackerViewModel: MyViewMod
                 trackerViewModel.stopTracker()
                 trackerViewModel.setCurrentDateTime(System.currentTimeMillis())
                 trackerViewModel.computeResults()
+                trackerViewModel.stopTracker()
+                val appContext = context.applicationContext
+                trackerViewModel.startTracker(appContext)
                 navController.navigate("home")
             },
             modifier = Modifier.fillMaxWidth()
